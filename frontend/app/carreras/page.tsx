@@ -529,9 +529,10 @@ export default function CarrerasPage() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h2 className="text-2xl font-black sm:text-3xl">
-                Simulador de Carreras 🔭
+                Carreras UTP 🔭
               </h2>
               <p className="mt-1 text-red-100 text-sm sm:text-base">
+                Explora todas las carreras que pueden existir en la Universidad Tecnológica del Perú.
                 Haz clic en cualquier carrera para ver cómo sería tu vida
                 profesional hoy mismo.
               </p>
