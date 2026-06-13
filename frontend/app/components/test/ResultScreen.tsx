@@ -149,6 +149,21 @@ export default function ResultScreen({
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
+          onClick={() => window.location.href = `/laboratorios?career=${result.careerKey}`}
+          style={{
+            width: "100%", padding: "13px",
+            background: "linear-gradient(135deg, #0369a1, #0ea5e9)",
+            border: "none", borderRadius: "12px",
+            color: "white", fontSize: "14px", fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          🔬 Ver Laboratorio de {result.title}
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => window.location.reload()}
           style={{
             width: "100%", padding: "12px",

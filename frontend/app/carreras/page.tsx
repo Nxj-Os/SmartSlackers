@@ -362,27 +362,42 @@ function SimulatorPanel({
       </div>
 
       {/* CTA */}
-      <div className="px-6 pb-6 pt-2 flex gap-3">
-        <motion.button
+      <div className="px-6 pb-6 pt-2 flex flex-col gap-2">
+        <div className="flex gap-3">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            className="flex-1 rounded-xl py-3 text-sm font-bold text-white shadow-lg"
+            style={{
+              background: `linear-gradient(135deg, ${career.color}, ${career.color}cc)`,
+              boxShadow: `0 8px 24px ${career.color}40`,
+            }}
+            onClick={() => (window.location.href = "/test")}
+          >
+            Hacer el test vocacional →
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={onClose}
+            className="rounded-xl border border-red-100 px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          >
+            Explorar otra
+          </motion.button>
+        </div>
+        <motion.a
+          href={`/laboratorios?career=${career.id}`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
-          className="flex-1 rounded-xl py-3 text-sm font-bold text-white shadow-lg"
+          className="flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold transition"
           style={{
-            background: `linear-gradient(135deg, ${career.color}, ${career.color}cc)`,
-            boxShadow: `0 8px 24px ${career.color}40`,
+            borderColor: career.color + "40",
+            color: career.color,
+            background: career.color + "08",
           }}
-          onClick={() => (window.location.href = "/test")}
         >
-          Hacer el test vocacional →
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onClose}
-          className="rounded-xl border border-red-100 px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-        >
-          Explorar otra
-        </motion.button>
+          🔬 Ver Laboratorio
+        </motion.a>
       </div>
     </motion.div>
   );
