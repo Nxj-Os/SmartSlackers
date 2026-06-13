@@ -65,14 +65,19 @@ export function useTestLogic() {
 
   // Contar qué carrera acumuló más respuestas
   const getResult = () => {
+    const valid = answers.filter((a) => a !== "none");
+
+    // Menos de 3 respuestas reales → no hay suficiente información
+    if (valid.length < 3) {
+      return { insufficient: true, answered: valid.length, careerKey: "" };
+    }
+
     const count: Record<string, number> = {};
-    answers.forEach((career) => {
-      if (career === "none") return;
+    valid.forEach((career) => {
       count[career] = (count[career] || 0) + 1;
     });
-    const winner =
-      Object.entries(count).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "software";
-    return { ...careerResults[winner], careerKey: winner };
+    const winner = Object.entries(count).sort((a, b) => b[1] - a[1])[0][0];
+    return { ...careerResults[winner], careerKey: winner, insufficient: false };
   };
 
   return {

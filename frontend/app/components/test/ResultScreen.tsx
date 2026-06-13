@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import AvatarCustomizer from "@/app/components/avatar/AvatarCustomizer";
 
 type Result = {
-  title: string; desc: string;
-  match: number; color: string; emoji: string;
+  title?: string; desc?: string;
+  match?: number; color?: string; emoji?: string;
   careerKey: string;
+  insufficient?: boolean;
+  answered?: number;
 };
 
 export default function ResultScreen({
@@ -15,25 +17,109 @@ export default function ResultScreen({
   const [displayMatch, setDisplayMatch] = useState(0);
   const [showAvatar, setShowAvatar] = useState(false);
 
+  // Contador de compatibilidad — solo corre si hay resultado real
   useEffect(() => {
+    if (result.insufficient || !result.match) return;
     let start = 0;
     const interval = setInterval(() => {
       start += 2;
-      if (start >= result.match) {
-        setDisplayMatch(result.match);
+      if (start >= result.match!) {
+        setDisplayMatch(result.match!);
         clearInterval(interval);
       } else {
         setDisplayMatch(start);
       }
     }, 25);
     return () => clearInterval(interval);
-  }, [result.match]);
+  }, [result.match, result.insufficient]);
 
+  // Avatar cosmético — solo si hay resultado real
   useEffect(() => {
+    if (result.insufficient) return;
     const t = setTimeout(() => setShowAvatar(true), 1200);
     return () => clearTimeout(t);
-  }, []);
+  }, [result.insufficient]);
 
+  // ── Pantalla de respuestas insuficientes ──────────────────────────
+  if (result.insufficient) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, type: "spring" }}
+        style={{
+          maxWidth: "480px", width: "100%",
+          textAlign: "center", padding: "3rem 2rem",
+          background: "rgba(255,255,255,0.96)",
+          border: "0.5px solid rgba(255,0,0,0.18)",
+          borderRadius: "20px",
+          backdropFilter: "blur(12px)",
+        }}
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", delay: 0.2, bounce: 0.5 }}
+          style={{ fontSize: "80px", marginBottom: "1.25rem", lineHeight: 1 }}
+        >
+          😔
+        </motion.div>
+
+        <motion.h2
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          style={{ fontSize: "22px", fontWeight: 700, color: "#cc2b2b", marginBottom: "0.75rem" }}
+        >
+          No hay suficientes características
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          style={{ fontSize: "14px", color: "#5b5b5b", lineHeight: 1.7, marginBottom: "0.5rem" }}
+        >
+          Solo respondiste{" "}
+          <strong style={{ color: "#cc2b2b" }}>
+            {result.answered ?? 0} de {10} preguntas
+          </strong>
+          . Necesitamos al menos <strong>3 respuestas</strong> para identificar
+          tu perfil vocacional con precisión.
+        </motion.p>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.65 }}
+          style={{ fontSize: "13px", color: "#8a8a8a", marginBottom: "2rem" }}
+        >
+          Tómate tu tiempo y elige la opción que más te represente. ¡Tú puedes! 💪
+        </motion.p>
+
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.75 }}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          onClick={() => window.location.reload()}
+          style={{
+            width: "100%", padding: "14px",
+            background: "linear-gradient(135deg, #ff6b6b, #cc2b2b)",
+            border: "none", borderRadius: "12px",
+            color: "white", fontSize: "15px", fontWeight: 700,
+            cursor: "pointer",
+            boxShadow: "0 8px 24px rgba(220,38,38,0.25)",
+          }}
+        >
+          🔄 Intentar de nuevo
+        </motion.button>
+      </motion.div>
+    );
+  }
+
+  // ── Pantalla de resultado normal ──────────────────────────────────
   return (
     <div className="w-full max-w-2xl mx-auto px-4 py-8 flex flex-col gap-8">
 
@@ -119,7 +205,6 @@ export default function ResultScreen({
             Ver mi roadmap personalizado →
           </motion.button>
 
-          {/* Botón nuevo del main */}
           <motion.button
             whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
             onClick={() => window.location.href = `/laboratorios?career=${result.careerKey}`}

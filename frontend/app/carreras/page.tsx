@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import { AREAS, careers as staticCareers, type Career } from "@/lib/careers";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { collection, getDocs, query, where, limit } from "firebase/firestore";
+import { db } from "@/src/firebase/config";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_MENTOR_API_URL || "http://127.0.0.1:8000";
@@ -121,6 +123,97 @@ function OutlookBadge({ outlook }: { outlook: Career["outlook"] }) {
       />
       {s.label}
     </span>
+  );
+}
+
+type TopPost = { userName: string; text: string; likeCount: number };
+
+function TopReview({ careerId, careerColor }: { careerId: string; careerColor: string }) {
+  const [post, setPost]     = useState<TopPost | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setPost(null);
+    setLoading(true);
+    (async () => {
+      try {
+        const snap = await getDocs(
+          query(collection(db, "Posts"), where("career", "==", careerId), limit(20)),
+        );
+        if (cancelled) return;
+        const list = snap.docs.map((d) => d.data() as TopPost);
+        list.sort((a, b) => (b.likeCount ?? 0) - (a.likeCount ?? 0));
+        setPost(list[0] ?? null);
+      } catch {
+        if (!cancelled) setPost(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [careerId]);
+
+  if (loading) {
+    return (
+      <div className="mx-6 mb-4 rounded-2xl border border-slate-100 p-4 animate-pulse">
+        <div className="h-2.5 w-32 rounded-full bg-slate-100 mb-3" />
+        <div className="space-y-2">
+          <div className="h-3 w-full rounded-full bg-slate-100" />
+          <div className="h-3 w-4/5 rounded-full bg-slate-100" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!post) return null;
+
+  const preview = post.text.length > 140 ? post.text.slice(0, 140).trimEnd() + "…" : post.text;
+
+  return (
+    <div className="mx-6 mb-4">
+      {/* Header row */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs font-bold uppercase tracking-wide" style={{ color: careerColor }}>
+            ⭐ Reseña destacada
+          </span>
+        </div>
+        <a
+          href={`/comunidad?career=${careerId}`}
+          className="text-[11px] font-semibold transition-colors hover:underline"
+          style={{ color: careerColor }}
+        >
+          Ver más reseñas →
+        </a>
+      </div>
+
+      {/* Card */}
+      <div
+        className="rounded-2xl p-4"
+        style={{ background: careerColor + "0d", border: `1px solid ${careerColor}25` }}
+      >
+        {/* Quote */}
+        <span className="text-2xl leading-none" style={{ color: careerColor + "55" }}>"</span>
+        <p className="text-sm text-slate-700 leading-relaxed -mt-1 mb-3">{preview}</p>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div
+              className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white"
+              style={{ background: `linear-gradient(135deg,${careerColor},${careerColor}99)` }}
+            >
+              {post.userName?.charAt(0).toUpperCase() ?? "?"}
+            </div>
+            <span className="text-xs font-semibold text-slate-600">{post.userName}</span>
+          </div>
+          <span className="flex items-center gap-1 text-xs text-slate-400">
+            ❤️ {post.likeCount ?? 0}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -360,6 +453,9 @@ function SimulatorPanel({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Top community review */}
+      <TopReview careerId={career.id} careerColor={career.color} />
 
       {/* CTA */}
       <div className="px-6 pb-6 pt-2 flex flex-col gap-2">
