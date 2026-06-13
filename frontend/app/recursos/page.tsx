@@ -7,6 +7,7 @@ import { auth } from "@/src/firebase/config";
 import { logout } from "@/src/services/authService";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/src/firebase/config";
+﻿import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -257,6 +258,7 @@ export default function ResourcesPage() {
           </div>
         </div>
       </header>
+      <Navbar />
 
       <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12 lg:px-8 lg:py-20 animate-fade-up">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-center">

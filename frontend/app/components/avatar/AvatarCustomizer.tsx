@@ -1,96 +1,258 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import AvatarPreview from "./AvatarPreview";
+import AvatarSVG from "./AvatarSVG";
+import { AvatarConfig, Career } from "@/types/avatar";
+import { SKIN_TONES, HAIR_COLORS, EYE_COLORS, CAREER_COSMETICS } from "@/lib/careerCosmetics";
+import { auth } from "@/src/firebase/config";
+import { saveAvatar, loadAvatar } from "@/src/services/avatarService";
+import { useAuthState } from "react-firebase-hooks/auth";
 
-const SKIN_COLORS = ["#FFDBAC", "#F1C27D", "#E0AC69", "#C68642", "#8D5524"];
-const HATS = [
-  { id: "ingenieria_casco", name: "Casco de Ingeniero" },
-  { id: "ciencias_bata", name: "Gorro Clínico" },
-];
-const EYES = [
-  { id: "lentes_inteligentes", name: "Lentes de Científico" },
-  { id: "monoculo", name: "Monóculo de Historiador" },
-];
+const DEFAULT_CONFIG: AvatarConfig = {
+  skinTone: "medium-light",
+  hairStyle: "medium",
+  hairColor: "black",
+  eyeColor: "brown",
+  outfitBase: "casual",
+  background: "sky",
+};
 
-export default function AvatarCustomizer() {
-  const [skinColor, setSkinColor] = useState(SKIN_COLORS[0]);
-  const [equippedHat, setEquippedHat] = useState<string | null>(null);
-  const [equippedEyes, setEquippedEyes] = useState<string | null>(null);
+interface AvatarCustomizerProps {
+  /** Si se pasa careerResult, aplica el cosmético automáticamente */
+  careerResult?: string | null;
+  /** Callback opcional al guardar */
+  onSaved?: () => void;
+}
+
+export default function AvatarCustomizer({ careerResult, onSaved }: AvatarCustomizerProps) {
+  const [user] = useAuthState(auth);
+  const [config, setConfig] = useState<AvatarConfig>(DEFAULT_CONFIG);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  // Cargar avatar guardado
+  useEffect(() => {
+    if (!user) return;
+    loadAvatar(user.uid).then((saved) => {
+      if (saved) setConfig(saved.config);
+    });
+  }, [user]);
+
+  // Aplicar cosmético cuando llega careerResult
+  useEffect(() => {
+    if (!careerResult) return;
+    const cosmetic = CAREER_COSMETICS[careerResult];
+    if (!cosmetic) return;
+    setConfig((prev) => ({
+      ...prev,
+      background: cosmetic.background,
+      careerCosmetic: cosmetic,
+    }));
+  }, [careerResult]);
+
+  function update<K extends keyof AvatarConfig>(key: K, value: AvatarConfig[K]) {
+    setConfig((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleSave() {
+    if (!user) return;
+    setSaving(true);
+    try {
+      await saveAvatar(user.uid, config, (careerResult as Career) ?? null);
+      setSaved(true);
+      onSaved?.();
+      setTimeout(() => setSaved(false), 3000);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const accentColor = config.careerCosmetic?.accentColor ?? "#7F77DD";
 
   return (
-    <div className="flex flex-col md:flex-row gap-8 items-center justify-center p-6 max-w-4xl mx-auto">
-      
+    <div className="flex flex-col md:flex-row gap-8 items-start justify-center p-6 max-w-4xl mx-auto">
+
+      {/* Avatar preview */}
       <div className="flex flex-col items-center gap-4">
         <h3 className="text-lg font-bold">Tu Avatar</h3>
-        <AvatarPreview 
-          skinColor={skinColor} 
-          equippedHat={equippedHat} 
-          equippedEyes={equippedEyes} 
-        />
+        <motion.div
+          className="rounded-2xl overflow-hidden border border-border shadow-inner"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 200 }}
+        >
+          <AvatarSVG config={config} size={240} />
+        </motion.div>
+
+        {/* Badge de carrera */}
+        {config.careerCosmetic && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center gap-1"
+          >
+            <span
+              className="text-sm font-semibold px-4 py-1 rounded-full text-white"
+              style={{ backgroundColor: accentColor }}
+            >
+              {config.careerCosmetic.badge} {config.careerCosmetic.label}
+            </span>
+            <p className="text-xs text-muted-foreground text-center max-w-[200px]">
+              {config.careerCosmetic.description}
+            </p>
+          </motion.div>
+        )}
+
+        {/* Guardar */}
+        {user ? (
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full max-w-[200px] py-2 rounded-xl text-sm font-medium text-white transition-opacity disabled:opacity-60"
+            style={{ backgroundColor: accentColor }}
+          >
+            {saving ? "Guardando…" : saved ? "✓ Guardado" : "Guardar avatar"}
+          </button>
+        ) : (
+          <p className="text-xs text-muted-foreground">Inicia sesión para guardar</p>
+        )}
       </div>
 
+      {/* Panel de personalización */}
       <Card className="w-full max-w-md">
         <CardContent className="pt-6">
           <Tabs defaultValue="skin" className="w-full">
             <TabsList className="grid grid-cols-3 mb-4">
               <TabsTrigger value="skin">Piel</TabsTrigger>
-              <TabsTrigger value="hats">Cabezas</TabsTrigger>
-              <TabsTrigger value="eyes">Ojos</TabsTrigger>
+              <TabsTrigger value="hair">Cabello</TabsTrigger>
+              <TabsTrigger value="style">Estilo</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="skin" className="flex gap-3 justify-center py-4">
-              {SKIN_COLORS.map((color) => (
-                <button
-                  key={color}
-                  className={`w-10 h-10 rounded-full border-2 ${skinColor === color ? 'border-primary scale-110' : 'border-transparent'}`}
-                  style={{ backgroundColor: color }}
-                  onClick={() => setSkinColor(color)}
-                />
-              ))}
+            {/* Piel */}
+            <TabsContent value="skin" className="space-y-4">
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Tono de piel</p>
+                <div className="flex gap-3 flex-wrap">
+                  {Object.entries(SKIN_TONES).map(([key, { fill, label }]) => (
+                    <button
+                      key={key}
+                      title={label}
+                      className={`w-10 h-10 rounded-full border-2 transition-transform ${config.skinTone === key ? "border-primary scale-110" : "border-transparent"}`}
+                      style={{ backgroundColor: fill }}
+                      onClick={() => update("skinTone", key as AvatarConfig["skinTone"])}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Color de ojos</p>
+                <div className="flex gap-3 flex-wrap">
+                  {Object.entries(EYE_COLORS).map(([key, { fill, label }]) => (
+                    <button
+                      key={key}
+                      title={label}
+                      className={`w-10 h-10 rounded-full border-2 transition-transform ${config.eyeColor === key ? "border-primary scale-110" : "border-transparent"}`}
+                      style={{ backgroundColor: fill }}
+                      onClick={() => update("eyeColor", key as AvatarConfig["eyeColor"])}
+                    />
+                  ))}
+                </div>
+              </div>
             </TabsContent>
 
-            <TabsContent value="hats" className="grid grid-cols-2 gap-2">
-              <button 
-                className={`p-3 text-sm rounded-lg border ${!equippedHat ? 'bg-secondary font-medium' : 'bg-background'}`}
-                onClick={() => setEquippedHat(null)}
-              >
-                Ninguno
-              </button>
-              {HATS.map((hat) => (
-                <button
-                  key={hat.id}
-                  className={`p-3 text-sm rounded-lg border text-left ${equippedHat === hat.id ? 'border-primary bg-primary/10' : 'bg-background'}`}
-                  onClick={() => setEquippedHat(hat.id)}
-                >
-                  {hat.name}
-                </button>
-              ))}
+            {/* Cabello */}
+            <TabsContent value="hair" className="space-y-4">
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Estilo</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["short","medium","long","curly","bun","braids"] as const).map((s) => (
+                    <button key={s}
+                      className={`p-2 text-xs rounded-lg border capitalize transition-colors ${config.hairStyle === s ? "border-primary bg-primary/10 font-medium" : "border-border bg-background"}`}
+                      onClick={() => update("hairStyle", s)}
+                    >
+                      {{"short":"Corto","medium":"Medio","long":"Largo","curly":"Rizado","bun":"Moño","braids":"Trenzas"}[s]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Color</p>
+                <div className="flex gap-3 flex-wrap">
+                  {Object.entries(HAIR_COLORS).map(([key, { fill, label }]) => (
+                    <button
+                      key={key}
+                      title={label}
+                      className={`w-10 h-10 rounded-full border-2 transition-transform ${config.hairColor === key ? "border-primary scale-110" : "border-transparent"}`}
+                      style={{ backgroundColor: fill }}
+                      onClick={() => update("hairColor", key as AvatarConfig["hairColor"])}
+                    />
+                  ))}
+                </div>
+              </div>
             </TabsContent>
 
-            <TabsContent value="eyes" className="grid grid-cols-2 gap-2">
-              <button 
-                className={`p-3 text-sm rounded-lg border ${!equippedEyes ? 'bg-secondary font-medium' : 'bg-background'}`}
-                onClick={() => setEquippedEyes(null)}
-              >
-                Ninguno
-              </button>
-              {EYES.map((eye) => (
-                <button
-                  key={eye.id}
-                  className={`p-3 text-sm rounded-lg border text-left ${equippedEyes === eye.id ? 'border-primary bg-primary/10' : 'bg-background'}`}
-                  onClick={() => setEquippedEyes(eye.id)}
-                >
-                  {eye.name}
-                </button>
-              ))}
+            {/* Estilo */}
+            <TabsContent value="style" className="space-y-4">
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Ropa</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { v: "casual",  l: "Casual",    c: "#7F77DD" },
+                    { v: "formal",  l: "Formal",    c: "#185FA5" },
+                    { v: "sporty",  l: "Deportivo", c: "#1D9E75" },
+                  ] as const).map(({ v, l, c }) => (
+                    <button key={v}
+                      className={`p-2 text-xs rounded-lg border flex items-center gap-2 transition-colors ${config.outfitBase === v ? "border-primary bg-primary/10 font-medium" : "border-border bg-background"}`}
+                      onClick={() => update("outfitBase", v)}
+                    >
+                      <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: c }} />
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Fondo</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { v: "sky",      l: "Cielo",       c: "#E6F1FB" },
+                    { v: "library",  l: "Biblioteca",  c: "#FAEEDA" },
+                    { v: "lab",      l: "Laboratorio", c: "#E1F5EE" },
+                    { v: "city",     l: "Ciudad",      c: "#B5D4F4" },
+                    { v: "nature",   l: "Naturaleza",  c: "#EAF3DE" },
+                    { v: "abstract", l: "Abstracto",   c: "#EEEDFE" },
+                  ] as const).map(({ v, l, c }) => (
+                    <button key={v}
+                      className={`p-2 text-xs rounded-lg border flex items-center gap-2 transition-colors ${config.background === v ? "border-primary bg-primary/10 font-medium" : "border-border bg-background"}`}
+                      onClick={() => update("background", v)}
+                    >
+                      <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: c }} />
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Cosmético activo (solo lectura) */}
+              {config.careerCosmetic && (
+                <div className="p-3 rounded-xl border border-violet-200 bg-violet-50 dark:bg-violet-950 dark:border-violet-800">
+                  <p className="text-xs font-medium text-violet-500 uppercase tracking-wider mb-1">
+                    Cosmético vocacional
+                  </p>
+                  <p className="text-sm font-semibold text-violet-800 dark:text-violet-200">
+                    {config.careerCosmetic.label}
+                  </p>
+                  <p className="text-xs text-violet-600 dark:text-violet-400 mt-0.5">
+                    {config.careerCosmetic.description}
+                  </p>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
-
     </div>
   );
 }
