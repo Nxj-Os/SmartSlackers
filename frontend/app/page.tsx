@@ -93,7 +93,7 @@ export default function Home() {
             </a>
             <a
               className="transition-colors hover:text-red-500"
-              href="#recursos"
+              href="/recursos"
             >
               Recursos
             </a>
