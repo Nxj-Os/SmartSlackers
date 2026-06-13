@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { useSimulationBadge } from "@/src/hooks/useSimulationBadge";
 
 // ─── Types ────────────────────────────────────────────────
 type GamePhase = "briefing" | "launch" | "dodge" | "landing" | "moonwalk" | "result";
@@ -1055,6 +1056,7 @@ function ResultScreen({ scores, onRetry, onExit }: { scores: number[]; onRetry: 
 export default function AstronautaPage() {
   const [phase, setPhase] = useState<GamePhase>("briefing");
   const [scores, setScores] = useState<number[]>([]);
+  useSimulationBadge(phase);
 
   const addScore = useCallback((pts: number) => {
     setScores((prev) => [...prev, pts]);

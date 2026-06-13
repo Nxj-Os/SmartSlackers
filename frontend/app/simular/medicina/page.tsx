@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { useSimulationBadge } from "@/src/hooks/useSimulationBadge";
 
 type GamePhase = "briefing" | "diagnose" | "defib" | "surgery" | "icu" | "result";
 
@@ -461,6 +462,7 @@ const PHASE_ORDER: GamePhase[] = ["briefing", "diagnose", "defib", "surgery", "i
 export default function MedicinaGame() {
   const [phase, setPhase] = useState<GamePhase>("briefing");
   const [scores, setScores] = useState<number[]>([]);
+  useSimulationBadge(phase);
 
   const advance = (score: number) => {
     const ns = [...scores, score];

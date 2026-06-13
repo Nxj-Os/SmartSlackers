@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "@/src/firebase/config";
 import Navbar from "@/components/Navbar";
+import { trackBadgeEvent, showBadgeNotification } from "@/src/services/badgeService";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -159,6 +160,11 @@ function CommentSection({
       setComments((p) => [...p, { id: ref.id, userId: currentUserId, userName: currentUserName, text: text.trim(), createdAt: new Date() }]);
       onCountChange(comments.length + 1);
       setText("");
+      // Badge: track comment made
+      try {
+        const { newBadges } = await trackBadgeEvent(currentUserId, "comment_made");
+        newBadges.forEach((b) => showBadgeNotification(b));
+      } catch { /* silent */ }
     } finally {
       setSending(false);
     }
@@ -467,6 +473,11 @@ function PostComposer({
       });
       setText("");
       setCareer("general");
+      // Badge: track post created
+      try {
+        const { newBadges } = await trackBadgeEvent(currentUserId, "post_created");
+        newBadges.forEach((b) => showBadgeNotification(b));
+      } catch { /* silent */ }
     } finally {
       setSubmitting(false);
     }
@@ -666,6 +677,13 @@ export default function ComunidadPage() {
       ? { likedBy: arrayRemove(currentUserId), likeCount: increment(-1) }
       : { likedBy: arrayUnion(currentUserId), likeCount: increment(1) },
     );
+    // Badge: track like given (only when liking, not unliking)
+    if (!isLiked) {
+      try {
+        const { newBadges } = await trackBadgeEvent(currentUserId, "like_given");
+        newBadges.forEach((b) => showBadgeNotification(b));
+      } catch { /* silent */ }
+    }
   };
 
   const handlePosted = (newPost: Post) => {

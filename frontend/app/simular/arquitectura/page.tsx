@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { useSimulationBadge } from "@/src/hooks/useSimulationBadge";
 
 type GamePhase = "briefing" | "blueprint" | "materials" | "balance" | "presentation" | "result";
 const PHASE_ORDER: GamePhase[] = ["briefing", "blueprint", "materials", "balance", "presentation", "result"];
@@ -412,6 +413,7 @@ function ResultScreen({ scores }: { scores: number[] }) {
 export default function ArquitecturaGame() {
   const [phase, setPhase] = useState<GamePhase>("briefing");
   const [scores, setScores] = useState<number[]>([]);
+  useSimulationBadge(phase);
 
   const advance = (score: number) => {
     setScores(s => [...s, score]);

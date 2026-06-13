@@ -2,6 +2,9 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import AvatarCustomizer from "@/app/components/avatar/AvatarCustomizer";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/src/firebase/config";
+import { trackBadgeEvent, showBadgeNotification } from "@/src/services/badgeService";
 
 type Result = {
   title?: string; desc?: string;
@@ -38,6 +41,19 @@ export default function ResultScreen({
     if (result.insufficient) return;
     const t = setTimeout(() => setShowAvatar(true), 1200);
     return () => clearTimeout(t);
+  }, [result.insufficient]);
+
+  // Badge: test completado
+  useEffect(() => {
+    if (result.insufficient) return;
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      try {
+        const { newBadges } = await trackBadgeEvent(user.uid, "test_completed");
+        newBadges.forEach((b) => showBadgeNotification(b));
+      } catch { /* silent */ }
+    });
+    return () => unsub();
   }, [result.insufficient]);
 
   // ── Pantalla de respuestas insuficientes ──────────────────────────

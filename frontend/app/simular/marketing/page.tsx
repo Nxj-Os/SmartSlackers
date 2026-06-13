@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { useSimulationBadge } from "@/src/hooks/useSimulationBadge";
 
 type GamePhase = "briefing" | "target" | "abtest" | "budget" | "metrics" | "result";
 const PHASE_ORDER: GamePhase[] = ["briefing", "target", "abtest", "budget", "metrics", "result"];
@@ -436,6 +437,7 @@ function ResultScreen({ scores }: { scores: number[] }) {
 export default function MarketingGame() {
   const [phase, setPhase] = useState<GamePhase>("briefing");
   const [scores, setScores] = useState<number[]>([]);
+  useSimulationBadge(phase);
 
   const advance = (score: number) => {
     setScores(s => [...s, score]);

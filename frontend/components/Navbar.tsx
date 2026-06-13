@@ -50,13 +50,10 @@ export default function Navbar({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
-<<<<<<< Updated upstream
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
-=======
   const [notifs, setNotifs] = useState<Notif[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
->>>>>>> Stashed changes
 
   const displayName = userName || user?.displayName || user?.email?.split("@")[0] || "Usuario";
   const unreadCount = notifs.filter((n) => !n.read).length;
@@ -101,7 +98,6 @@ export default function Navbar({
     return () => unsub();
   }, []);
 
-<<<<<<< Updated upstream
   // Cierra el menú del avatar al hacer clic fuera
   useEffect(() => {
     if (!avatarMenuOpen) return;
@@ -114,9 +110,6 @@ export default function Navbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [avatarMenuOpen]);
 
-  const handleLogout = async () => {
-    setAvatarMenuOpen(false);
-=======
   // Notifications real-time listener
   useEffect(() => {
     if (!user?.uid) { setNotifs([]); return; }
@@ -130,7 +123,6 @@ export default function Navbar({
       q,
       (snap) => setNotifs(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Notif))),
       () => {
-        // Composite index not ready yet — fetch without orderBy
         const q2 = query(collection(db, "Notificaciones", user.uid!, "items"), limit(20));
         unsub = onSnapshot(q2, (snap) => {
           const items = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Notif));
@@ -142,9 +134,9 @@ export default function Navbar({
   }, [user?.uid]);
 
   const handleLogout = async () => {
+    setAvatarMenuOpen(false);
     localStorage.setItem("vocatio_notif_count", "0");
     setCachedCount(0);
->>>>>>> Stashed changes
     await logout();
     router.push("/login");
   };
@@ -292,21 +284,6 @@ export default function Navbar({
                     <span className={`text-[10px] ${brandSub}`}>{userEmail}</span>
                   </div>
 
-<<<<<<< Updated upstream
-                  {/* Círculo rojo con inicial — al presionar abre el menú */}
-                  <div className="relative" ref={avatarRef}>
-                    <button
-                      type="button"
-                      onClick={() => setAvatarMenuOpen((v) => !v)}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-rose-500 text-white text-xs font-bold shadow shadow-red-500/30 transition-transform hover:scale-105"
-                    >
-                      {displayName.charAt(0).toUpperCase()}
-                    </button>
-
-                    {/* Menú desplegable del avatar */}
-                    <AnimatePresence>
-                      {avatarMenuOpen && (
-=======
                   {/* ── Notification bell ── */}
                   <div className="relative z-50">
                     <button
@@ -342,36 +319,11 @@ export default function Navbar({
                     {/* Notification dropdown */}
                     <AnimatePresence>
                       {notifOpen && (
->>>>>>> Stashed changes
                         <motion.div
                           initial={{ opacity: 0, scale: 0.95, y: -4 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95, y: -4 }}
                           transition={{ duration: 0.15 }}
-<<<<<<< Updated upstream
-                          className="absolute right-0 top-11 z-50 w-44 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl"
-                        >
-                          <button
-                            type="button"
-                            className="w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                            onClick={() => {
-                              setAvatarMenuOpen(false);
-                              router.push("/perfil");
-                            }}
-                          >
-                            Ver perfil
-                          </button>
-                          <button
-                            type="button"
-                            className="mt-1 w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
-                            onClick={handleLogout}
-                          >
-                            Cerrar sesión
-                          </button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-=======
                           className="absolute right-0 top-10 w-72 rounded-2xl border border-slate-100 bg-white shadow-xl overflow-hidden"
                         >
                           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
@@ -445,9 +397,46 @@ export default function Navbar({
                     </AnimatePresence>
                   </div>
 
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-rose-500 text-white text-xs font-bold">
-                    {displayName.charAt(0).toUpperCase()}
->>>>>>> Stashed changes
+                  {/* Círculo rojo con inicial — al presionar abre el menú */}
+                  <div className="relative" ref={avatarRef}>
+                    <button
+                      type="button"
+                      onClick={() => setAvatarMenuOpen((v) => !v)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-rose-500 text-white text-xs font-bold shadow shadow-red-500/30 transition-transform hover:scale-105"
+                    >
+                      {displayName.charAt(0).toUpperCase()}
+                    </button>
+
+                    {/* Menú desplegable del avatar */}
+                    <AnimatePresence>
+                      {avatarMenuOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 top-11 z-50 w-44 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl"
+                        >
+                          <button
+                            type="button"
+                            className="w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                            onClick={() => {
+                              setAvatarMenuOpen(false);
+                              router.push("/perfil");
+                            }}
+                          >
+                            Ver perfil
+                          </button>
+                          <button
+                            type="button"
+                            className="mt-1 w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
+                            onClick={handleLogout}
+                          >
+                            Cerrar sesión
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </>
               ) : null}

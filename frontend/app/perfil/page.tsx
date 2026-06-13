@@ -9,6 +9,9 @@ import { db } from "@/src/firebase/config";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { careers } from "@/lib/careers";
+import { UserBadge } from "@/lib/badges";
+import { fetchUserBadges } from "@/src/services/badgeService";
+import BadgeDisplay from "@/app/components/BadgeDisplay";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -100,6 +103,13 @@ export default function PerfilPage() {
   const [carrerasAnalizadas, setCarrerasAnalizadas] = useState<CarreraAnalizada[] | null>(null);
   const [errorAnalisis,     setErrorAnalisis]      = useState<string | null>(null);
 
+  // Badges
+  const [badges, setBadges]                   = useState<UserBadge[]>([]);
+  const [totalXp, setTotalXp]                 = useState(0);
+  const [totalUnlocked, setTotalUnlocked]     = useState(0);
+  const [totalAvailable, setTotalAvailable]   = useState(0);
+  const [badgesLoading, setBadgesLoading]     = useState(true);
+
   // Colección en Firestore donde está el usuario (se detecta al cargar)
   const [colUsuario, setColUsuario] = useState<string>("usuarios");
 
@@ -139,6 +149,20 @@ export default function PerfilPage() {
 
       // Carga los intereses guardados
       setIntereses((foundProfile?.intereses as string[]) || []);
+
+      // Carga badges del usuario
+      try {
+        const badgeData = await fetchUserBadges(currentUser.uid);
+        setBadges(badgeData.badges);
+        setTotalXp(badgeData.totalXp);
+        setTotalUnlocked(badgeData.totalUnlocked);
+        setTotalAvailable(badgeData.totalAvailable);
+      } catch {
+        // badges are optional, fail silently
+      } finally {
+        setBadgesLoading(false);
+      }
+
       setLoading(false);
     });
 
@@ -687,6 +711,34 @@ export default function PerfilPage() {
               <p className="text-sm leading-6 text-slate-600">
                 Edición de datos del perfil, foto de cuenta y notificaciones sobre tu proceso de admisión.
               </p>
+            </div>
+
+            {/* ── Badges / Logros ── */}
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
+                  Badges y Logros
+                </p>
+                {totalXp > 0 && (
+                  <div className="flex items-center gap-1.5 rounded-xl bg-amber-50 px-2.5 py-1">
+                    <span className="text-xs">⭐</span>
+                    <span className="text-xs font-bold text-amber-700">{totalXp} XP</span>
+                  </div>
+                )}
+              </div>
+
+              {badgesLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="h-6 w-6 animate-spin rounded-full border-4 border-red-200 border-t-red-600" />
+                </div>
+              ) : (
+                <BadgeDisplay
+                  badges={badges}
+                  totalXp={totalXp}
+                  totalUnlocked={totalUnlocked}
+                  totalAvailable={totalAvailable}
+                />
+              )}
             </div>
           </aside>
         </section>

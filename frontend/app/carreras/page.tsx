@@ -3,9 +3,12 @@
 import Navbar from "@/components/Navbar";
 import { AREAS, careers as staticCareers, type Career } from "@/lib/careers";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/src/firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/src/firebase/config";
+import { trackBadgeEvent, showBadgeNotification } from "@/src/services/badgeService";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_MENTOR_API_URL || "http://127.0.0.1:8000";
@@ -571,6 +574,29 @@ export default function CarrerasPage() {
   const [count, setCount] = useState(0);
   const [careersList, setCareersList] = useState<Career[]>(staticCareers);
 
+  // Badge: track career exploration
+  const handleCareerSelect = useCallback((career: Career | null) => {
+    setSelected(career);
+    if (career) {
+      // Track unique career exploration using localStorage
+      try {
+        const explored = JSON.parse(localStorage.getItem("exploredCareers") || "[]") as string[];
+        if (!explored.includes(career.id)) {
+          explored.push(career.id);
+          localStorage.setItem("exploredCareers", JSON.stringify(explored));
+          // Send to backend
+          onAuthStateChanged(auth, (user) => {
+            if (user) {
+              trackBadgeEvent(user.uid, "career_explored").then(({ newBadges }) => {
+                newBadges.forEach((b) => showBadgeNotification(b));
+              }).catch(() => {});
+            }
+          });
+        }
+      } catch { /* silent */ }
+    }
+  }, []);
+
   // Fetch careers from backend API (Firestore-backed)
   useEffect(() => {
     const fetchCareers = async () => {
@@ -711,7 +737,7 @@ export default function CarrerasPage() {
                         career={career}
                         selected={selected?.id === career.id}
                         onClick={() =>
-                          setSelected(
+                          handleCareerSelect(
                             selected?.id === career.id ? null : career,
                           )
                         }

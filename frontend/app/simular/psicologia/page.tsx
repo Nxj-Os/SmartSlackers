@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { useSimulationBadge } from "@/src/hooks/useSimulationBadge";
 
 type GamePhase = "briefing" | "emotion" | "technique" | "response" | "crisis" | "result";
 const PHASE_ORDER: GamePhase[] = ["briefing", "emotion", "technique", "response", "crisis", "result"];
@@ -405,6 +406,7 @@ function ResultScreen({ scores }: { scores: number[] }) {
 export default function PsicologiaGame() {
   const [phase, setPhase] = useState<GamePhase>("briefing");
   const [scores, setScores] = useState<number[]>([]);
+  useSimulationBadge(phase);
 
   const advance = (score: number) => {
     setScores(s => [...s, score]);
