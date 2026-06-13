@@ -35,11 +35,13 @@ const handleRegister = async () => {
       return;
     }
 
-      await register(
+      const result = await register(
       email,
       password,
       name
     );
+
+    document.cookie = `vocatio_session=${result.user.uid}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
 
     alert("Usuario registrado correctamente");
 
@@ -52,7 +54,8 @@ const handleRegister = async () => {
 
   const handleLogin = async () => {
     try {
-      await login(email, password);
+      const result = await login(email, password);
+      document.cookie = `vocatio_session=${result.user.uid}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
       alert("Inicio de sesión exitoso");
       router.push("/");
     } catch (error: any) {
