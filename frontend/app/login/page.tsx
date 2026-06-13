@@ -350,7 +350,7 @@ const handleRegister = async () => {
           </div>
 
           <div className="mt-8 text-center text-sm text-gray-500">
-            JourneyAI © 2026
+            VocatioAI © 2026
           </div>
 
         </motion.div>

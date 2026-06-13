@@ -1,798 +1,491 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { simulations, type Simulation, type Scene } from "@/lib/simulations";
 
-// ─── Scene art renderer ────────────────────────────────────
-function SceneArt({ scene, color }: { scene: Scene; color: string }) {
+// Stable star data for astronauta card
+const ASTRO_STARS = Array.from({ length: 40 }, (_, i) => ({
+  id: i,
+  left: parseFloat(((i * 37.3) % 100).toFixed(1)),
+  top: parseFloat(((i * 53.7) % 100).toFixed(1)),
+  w: parseFloat(((i % 3) * 0.7 + 0.5).toFixed(1)),
+  opacity: parseFloat(((i % 5) * 0.12 + 0.15).toFixed(2)),
+}));
+
+type Deco = { t: string; x: number; y: number; s: number; o: number; color?: string };
+
+type CareerCard = {
+  id: string;
+  href: string;
+  emoji: string;
+  title: string;
+  tagline: string;
+  color: string;
+  gradient: string;
+  bg: string;
+  border: string;
+  badge: string;
+  features: string[];
+  decos: Deco[];
+  svgType?: "ecg" | "grid" | "matrix" | "flame";
+};
+
+const CAREER_CARDS: CareerCard[] = [
+  {
+    id: "astronauta",
+    href: "/simular/astronauta",
+    emoji: "🚀",
+    title: "Astronauta",
+    tagline: "Misión Apolo X — lanza, esquiva asteroides y aterriza en la Luna",
+    color: "#fbbf24",
+    gradient: "linear-gradient(135deg,#dc2626,#f97316)",
+    bg: "radial-gradient(ellipse at 30% 30%, #0f0c29 0%, #000510 100%)",
+    border: "rgba(255,255,255,0.18)",
+    badge: "🌟 Exclusivo",
+    features: ["🚀 Lanzamiento", "☄️ Asteroides", "🌕 Aterrizaje", "🧑‍🚀 Paseo Lunar"],
+    decos: [],
+  },
+  {
+    id: "medicina",
+    href: "/simular/medicina",
+    emoji: "🏥",
+    title: "Medicina",
+    tagline: "Diagnóstica, desfibrilas y opera. ¿Tienes lo que se necesita?",
+    color: "#bae6fd",
+    gradient: "linear-gradient(135deg,#0284c7,#38bdf8)",
+    bg: "linear-gradient(145deg, #0369a1 0%, #0ea5e9 55%, #38bdf8 100%)",
+    border: "rgba(186,230,253,0.45)",
+    badge: "🎮 Juego real",
+    features: [],
+    decos: [
+      { t: "❤️", x: 75, y: 10, s: 1.8, o: 0.28 },
+      { t: "🩺", x: 7, y: 68, s: 1.4, o: 0.25 },
+      { t: "💊", x: 79, y: 64, s: 1.2, o: 0.22 },
+      { t: "+", x: 60, y: 40, s: 3.2, o: 0.12, color: "#fff" },
+      { t: "+", x: 18, y: 20, s: 2.0, o: 0.1, color: "#fff" },
+      { t: "🏥", x: 54, y: 83, s: 1.3, o: 0.22 },
+    ],
+    svgType: "ecg",
+  },
+  {
+    id: "derecho",
+    href: "/simular/derecho",
+    emoji: "⚖️",
+    title: "Derecho",
+    tagline: "Evalúa evidencias, objeta testimonios y gana el caso.",
+    color: "#fef3c7",
+    gradient: "linear-gradient(135deg,#92400e,#fbbf24)",
+    bg: "linear-gradient(145deg, #78350f 0%, #b45309 55%, #d97706 100%)",
+    border: "rgba(254,243,199,0.4)",
+    badge: "🎮 Juego real",
+    features: [],
+    decos: [
+      { t: "⚖️", x: 70, y: 9, s: 1.9, o: 0.28 },
+      { t: "📜", x: 7, y: 66, s: 1.4, o: 0.25 },
+      { t: "🏛️", x: 75, y: 66, s: 1.6, o: 0.24 },
+      { t: "🔨", x: 52, y: 48, s: 1.5, o: 0.18 },
+      { t: "📖", x: 18, y: 14, s: 1.2, o: 0.22 },
+    ],
+  },
+  {
+    id: "arquitectura",
+    href: "/simular/arquitectura",
+    emoji: "🏛️",
+    title: "Arquitectura",
+    tagline: "Diseña planos, balancea estructuras y presenta al cliente.",
+    color: "#dbeafe",
+    gradient: "linear-gradient(135deg,#1d4ed8,#60a5fa)",
+    bg: "linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 55%, #3b82f6 100%)",
+    border: "rgba(219,234,254,0.4)",
+    badge: "🎮 Juego real",
+    features: [],
+    decos: [
+      { t: "📐", x: 70, y: 9, s: 1.7, o: 0.28 },
+      { t: "📏", x: 7, y: 63, s: 1.4, o: 0.25 },
+      { t: "🏗️", x: 73, y: 66, s: 1.6, o: 0.25 },
+      { t: "🔲", x: 50, y: 80, s: 1.3, o: 0.18 },
+    ],
+    svgType: "grid",
+  },
+  {
+    id: "gastronomia",
+    href: "/simular/gastronomia",
+    emoji: "👨‍🍳",
+    title: "Gastronomía",
+    tagline: "Prepara mise en place, controla temperatura y emplata con arte.",
+    color: "#ffedd5",
+    gradient: "linear-gradient(135deg,#c2410c,#f97316)",
+    bg: "linear-gradient(145deg, #7c2d12 0%, #c2410c 55%, #ea580c 100%)",
+    border: "rgba(255,237,213,0.4)",
+    badge: "🎮 Juego real",
+    features: [],
+    decos: [
+      { t: "🔥", x: 67, y: 7, s: 2.0, o: 0.32 },
+      { t: "🍳", x: 7, y: 60, s: 1.6, o: 0.28 },
+      { t: "🌶️", x: 76, y: 63, s: 1.3, o: 0.28 },
+      { t: "✨", x: 40, y: 80, s: 1.1, o: 0.22 },
+      { t: "🔥", x: 26, y: 86, s: 1.4, o: 0.22 },
+      { t: "🧂", x: 57, y: 43, s: 1.1, o: 0.2 },
+    ],
+    svgType: "flame",
+  },
+  {
+    id: "ingenieria-civil",
+    href: "/simular/ingenieria-civil",
+    emoji: "🏗️",
+    title: "Ing. Civil",
+    tagline: "Mezcla concreto, calcula cargas e inspecciona la obra.",
+    color: "#fde68a",
+    gradient: "linear-gradient(135deg,#92400e,#d97706)",
+    bg: "linear-gradient(145deg, #451a03 0%, #92400e 55%, #b45309 100%)",
+    border: "rgba(253,230,138,0.4)",
+    badge: "🎮 Juego real",
+    features: [],
+    decos: [
+      { t: "⚙️", x: 70, y: 9, s: 1.7, o: 0.28 },
+      { t: "🔩", x: 7, y: 63, s: 1.5, o: 0.28 },
+      { t: "🦺", x: 74, y: 66, s: 1.5, o: 0.25 },
+      { t: "🔨", x: 52, y: 80, s: 1.4, o: 0.22 },
+      { t: "📐", x: 20, y: 16, s: 1.2, o: 0.22 },
+    ],
+  },
+  {
+    id: "software",
+    href: "/simular/software",
+    emoji: "💻",
+    title: "Software",
+    tagline: "Debuggea código, optimiza algoritmos y asegura el deploy.",
+    color: "#bbf7d0",
+    gradient: "linear-gradient(135deg,#166534,#4ade80)",
+    bg: "linear-gradient(145deg, #052e16 0%, #14532d 55%, #166534 100%)",
+    border: "rgba(187,247,208,0.4)",
+    badge: "🎮 Juego real",
+    features: [],
+    decos: [
+      { t: "</>", x: 65, y: 7, s: 0.78, o: 0.35, color: "#86efac" },
+      { t: "{ }", x: 7, y: 16, s: 0.8, o: 0.3, color: "#86efac" },
+      { t: "const", x: 55, y: 53, s: 0.64, o: 0.28, color: "#86efac" },
+      { t: "fn()", x: 9, y: 70, s: 0.7, o: 0.28, color: "#86efac" },
+      { t: "01010", x: 62, y: 78, s: 0.58, o: 0.24, color: "#86efac" },
+      { t: "=>", x: 37, y: 84, s: 0.74, o: 0.28, color: "#86efac" },
+      { t: "//", x: 49, y: 28, s: 0.74, o: 0.28, color: "#86efac" },
+    ],
+    svgType: "matrix",
+  },
+  {
+    id: "psicologia",
+    href: "/simular/psicologia",
+    emoji: "🧠",
+    title: "Psicología",
+    tagline: "Identifica emociones, aplica terapias y gestiona crisis.",
+    color: "#ede9fe",
+    gradient: "linear-gradient(135deg,#6d28d9,#c4b5fd)",
+    bg: "linear-gradient(145deg, #2e1065 0%, #4c1d95 55%, #6d28d9 100%)",
+    border: "rgba(237,233,254,0.4)",
+    badge: "🎮 Juego real",
+    features: [],
+    decos: [
+      { t: "🧠", x: 70, y: 9, s: 1.7, o: 0.28 },
+      { t: "💭", x: 7, y: 58, s: 1.5, o: 0.25 },
+      { t: "✨", x: 77, y: 63, s: 1.3, o: 0.3 },
+      { t: "🌿", x: 52, y: 80, s: 1.3, o: 0.25 },
+      { t: "💫", x: 21, y: 18, s: 1.1, o: 0.22 },
+    ],
+  },
+  {
+    id: "marketing",
+    href: "/simular/marketing",
+    emoji: "📣",
+    title: "Marketing",
+    tagline: "Segmenta audiencias, elige el mejor copy y mide tu ROI.",
+    color: "#fce7f3",
+    gradient: "linear-gradient(135deg,#9d174d,#f472b6)",
+    bg: "linear-gradient(145deg, #4a044e 0%, #831843 55%, #be185d 100%)",
+    border: "rgba(252,231,243,0.4)",
+    badge: "🎮 Juego real",
+    features: [],
+    decos: [
+      { t: "📱", x: 70, y: 7, s: 1.6, o: 0.28 },
+      { t: "📊", x: 7, y: 63, s: 1.6, o: 0.28 },
+      { t: "⭐", x: 77, y: 63, s: 1.3, o: 0.3 },
+      { t: "🎯", x: 52, y: 80, s: 1.4, o: 0.25 },
+      { t: "💎", x: 21, y: 16, s: 1.1, o: 0.24 },
+    ],
+  },
+];
+
+// ─── SVG decoration layers ────────────────────────────────────
+
+function EcgLayer() {
   return (
-    <div
-      className="relative w-full overflow-hidden rounded-2xl"
-      style={{ background: scene.bg, minHeight: 260, maxHeight: 300 }}
-    >
-      {scene.elements.map((el, i) => (
-        <motion.span
-          key={i}
-          className="absolute select-none pointer-events-none"
-          style={{
-            fontSize: el.size,
-            left: el.x,
-            top: el.y,
-            zIndex: el.zIndex ?? 1,
-            filter:
-              i === 0
-                ? "drop-shadow(0 12px 24px rgba(0,0,0,0.4))"
-                : "drop-shadow(0 4px 8px rgba(0,0,0,0.2))",
-          }}
-          animate={
-            el.animate === "float"
-              ? { y: [0, -12, 0] }
-              : el.animate === "pulse"
-              ? { scale: [1, 1.12, 1], opacity: [0.85, 1, 0.85] }
-              : el.animate === "spin"
-              ? { rotate: [0, 360] }
-              : {}
-          }
-          transition={
-            el.animate === "spin"
-              ? { duration: 8, repeat: Infinity, ease: "linear" }
-              : el.animate !== "none"
-              ? {
-                  duration: 2.5 + i * 0.4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: i * 0.3,
-                }
-              : {}
-          }
-        >
-          {el.emoji}
-        </motion.span>
-      ))}
-
-      {/* chapter label */}
-      <div className="absolute top-3 left-3 z-10">
-        <span
-          className="rounded-full px-3 py-1 text-xs font-bold text-white shadow-lg backdrop-blur-sm"
-          style={{ background: "rgba(0,0,0,0.45)" }}
-        >
-          {scene.chapter}
-        </span>
-      </div>
-
-      {/* bottom gradient */}
-      <div
-        className="absolute inset-x-0 bottom-0 h-20 z-10"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)",
-        }}
-      />
-      <p
-        className="absolute bottom-3 left-4 right-4 z-20 text-sm font-semibold text-white leading-snug"
-        style={{ textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}
-      >
-        {scene.situation}
-      </p>
+    <div className="absolute inset-x-0 bottom-0 h-16 pointer-events-none overflow-hidden rounded-b-3xl">
+      <svg viewBox="0 0 272 64" className="w-full h-full" preserveAspectRatio="none"
+        style={{ opacity: 0.14 }}>
+        <path
+          d="M0 48 L52 48 L66 48 L76 20 L86 62 L96 6 L106 60 L118 48 L140 48 L272 48"
+          fill="none" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+        />
+      </svg>
     </div>
   );
 }
 
-// ─── Result screen ─────────────────────────────────────────
-function ResultScreen({
-  simulation,
-  score,
-  maxScore,
-  onRetry,
-  onExit,
-}: {
-  simulation: Simulation;
-  score: number;
-  maxScore: number;
-  onRetry: () => void;
-  onExit: () => void;
-}) {
-  const pct = Math.round((score / maxScore) * 100);
-  const [displayPct, setDisplayPct] = useState(0);
-
-  useEffect(() => {
-    let n = 0;
-    const step = Math.ceil(pct / 60);
-    const interval = setInterval(() => {
-      n = Math.min(n + step, pct);
-      setDisplayPct(n);
-      if (n >= pct) clearInterval(interval);
-    }, 22);
-    return () => clearInterval(interval);
-  }, [pct]);
-
-  const level =
-    pct >= 80
-      ? { label: "¡Eres un NATURAL!", color: "#16a34a", emoji: "🏆", msg: "Esta carrera fue hecha para ti. Tienes las decisiones, la mentalidad y el instinto. ¡No lo dudes!" }
-      : pct >= 60
-      ? { label: "¡Tienes madera!", color: "#d97706", emoji: "⭐", msg: "Con práctica y estudio llegarías muy lejos. Tus decisiones muestran que el perfil está ahí." }
-      : pct >= 40
-      ? { label: "No es tu fuerte... todavía", color: "#ea580c", emoji: "💪", msg: "Hay aptitud, pero necesitas desarrollarla más. El esfuerzo puede cambiar todo. ¡No te rindas!" }
-      : { label: "Quizás hay otra carrera para ti", color: "#dc2626", emoji: "🔍", msg: "Esta carrera te desafiaría mucho. Eso no es malo — el mayor reto crea al mejor profesional. O quizás explora otras opciones." };
-
-  const rings = [
-    { r: 70, stroke: 8, opacity: 0.15 },
-    { r: 55, stroke: 5, opacity: 0.1 },
-  ];
-  const circumference = 2 * Math.PI * 70;
-  const dash = (displayPct / 100) * circumference;
-
+function GridLayer() {
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.92 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: "spring", stiffness: 260, damping: 24 }}
-      className="flex flex-col items-center gap-6 px-4 py-8 text-center max-w-md mx-auto"
-    >
-      {/* circular progress */}
-      <div className="relative flex items-center justify-center">
-        <svg width={180} height={180} className="-rotate-90">
-          {rings.map((ring, i) => (
-            <circle
-              key={i}
-              cx={90}
-              cy={90}
-              r={ring.r}
-              fill="none"
-              stroke={simulation.color}
-              strokeWidth={ring.stroke}
-              opacity={ring.opacity}
-            />
-          ))}
-          <circle
-            cx={90}
-            cy={90}
-            r={70}
-            fill="none"
-            stroke="#e5e7eb"
-            strokeWidth={10}
-          />
-          <motion.circle
-            cx={90}
-            cy={90}
-            r={70}
-            fill="none"
-            stroke={simulation.color}
-            strokeWidth={10}
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            initial={{ strokeDashoffset: circumference }}
-            animate={{ strokeDashoffset: circumference - dash }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-          />
-        </svg>
-        <div className="absolute flex flex-col items-center">
-          <span className="text-4xl">{level.emoji}</span>
-          <span
-            className="text-3xl font-black"
-            style={{ color: simulation.color }}
-          >
-            {displayPct}%
-          </span>
-          <span className="text-xs text-slate-500 font-medium">aptitud</span>
-        </div>
-      </div>
-
-      {/* career badge */}
-      <div
-        className="flex items-center gap-2 rounded-2xl px-5 py-3 shadow-lg"
-        style={{
-          background: simulation.gradient,
-          boxShadow: `0 8px 32px ${simulation.color}40`,
-        }}
-      >
-        <span className="text-3xl">{simulation.emoji}</span>
-        <div className="text-left">
-          <p className="text-xs text-white/80 font-medium">Simulaste</p>
-          <p className="text-base font-black text-white">{simulation.title}</p>
-        </div>
-      </div>
-
-      {/* verdict */}
-      <div className="space-y-2">
-        <h2
-          className="text-2xl font-black"
-          style={{ color: level.color }}
-        >
-          {level.label}
-        </h2>
-        <p className="text-sm text-slate-600 leading-relaxed max-w-xs mx-auto">
-          {level.msg}
-        </p>
-      </div>
-
-      {/* score detail */}
-      <div className="grid grid-cols-2 gap-3 w-full">
-        <div className="rounded-xl bg-slate-50 p-3 text-center border border-slate-100">
-          <p className="text-2xl font-black text-slate-900">{score}</p>
-          <p className="text-xs text-slate-500">puntos obtenidos</p>
-        </div>
-        <div className="rounded-xl bg-slate-50 p-3 text-center border border-slate-100">
-          <p className="text-2xl font-black text-slate-900">{maxScore}</p>
-          <p className="text-xs text-slate-500">puntos posibles</p>
-        </div>
-      </div>
-
-      {/* CTAs */}
-      <div className="flex flex-col gap-3 w-full">
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onRetry}
-          className="w-full rounded-xl py-3.5 text-sm font-bold text-white shadow-lg"
-          style={{
-            background: simulation.gradient,
-            boxShadow: `0 8px 24px ${simulation.color}40`,
-          }}
-        >
-          🔄 Volver a intentarlo
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onExit}
-          className="w-full rounded-xl border border-red-100 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-        >
-          🔭 Simular otra carrera
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => (window.location.href = "/test")}
-          className="w-full rounded-xl bg-slate-900 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
-        >
-          📋 Hacer el test vocacional oficial
-        </motion.button>
-      </div>
-    </motion.div>
+    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+      <svg width="100%" height="100%" style={{ opacity: 0.13 }}>
+        <defs>
+          <pattern id="bpGrid" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+            <circle cx="0" cy="0" r="1" fill="#60a5fa" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#bpGrid)" />
+      </svg>
+    </div>
   );
 }
 
-// ─── Game engine ───────────────────────────────────────────
-function SimulationGame({
-  simulation,
-  onFinish,
-}: {
-  simulation: Simulation;
-  onFinish: (score: number, max: number) => void;
-}) {
-  const [sceneIdx, setSceneIdx] = useState(0);
-  const [chosen, setChosen] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
-  const [showFeedback, setShowFeedback] = useState(false);
+const MATRIX_COLS = [
+  { x: "14%", chars: ["f", "u", "n", "c", "(", ")"] },
+  { x: "36%", chars: ["0", "1", "0", "1", "1", "0"] },
+  { x: "60%", chars: ["{", "}", ";", "=", ">", ":"] },
+  { x: "82%", chars: ["n", "u", "l", "l", "s", "t"] },
+] as const;
 
-  const scene = simulation.scenes[sceneIdx];
-  const progress = ((sceneIdx + (chosen !== null ? 1 : 0)) / simulation.scenes.length) * 100;
-  const maxScore = simulation.scenes.length * 25;
-
-  const handleChoice = useCallback(
-    (idx: number) => {
-      if (chosen !== null) return;
-      setChosen(idx);
-      setScore((s) => s + scene.choices[idx].points);
-      setShowFeedback(true);
-    },
-    [chosen, scene]
+function MatrixLayer() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl"
+      style={{ opacity: 0.1 }}>
+      {MATRIX_COLS.map((col, ci) => (
+        <div key={ci} className="absolute top-2 flex flex-col" style={{ left: col.x, gap: "6px" }}>
+          {col.chars.map((ch, i) => (
+            <span key={i} className="font-mono leading-none"
+              style={{ fontSize: "0.6rem", color: "#4ade80", opacity: 0.4 + i * 0.1 }}>
+              {ch}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
   );
+}
 
-  const handleNext = () => {
-    const next = sceneIdx + 1;
-    if (next >= simulation.scenes.length) {
-      onFinish(score + scene.choices[chosen!].points, maxScore);
-    } else {
-      setSceneIdx(next);
-      setChosen(null);
-      setShowFeedback(false);
+function FlameLayer() {
+  return (
+    <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none rounded-b-3xl"
+      style={{ background: "linear-gradient(to top, rgba(249,115,22,0.18) 0%, transparent 100%)" }}
+    />
+  );
+}
+
+// ─── Carousel ─────────────────────────────────────────────────
+const CARD_W = 272;
+const CARD_GAP = 16;
+
+function Carousel() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [idx, setIdx] = useState(0);
+  const total = CAREER_CARDS.length;
+  const canPrev = idx > 0;
+  const canNext = idx < total - 1;
+
+  const go = (dir: number) => {
+    const next = Math.max(0, Math.min(total - 1, idx + dir));
+    setIdx(next);
+    if (trackRef.current) {
+      trackRef.current.scrollTo({ left: next * (CARD_W + CARD_GAP), behavior: "smooth" });
     }
   };
 
-  const OPTIONS = [
-    { color: "#2563eb", bg: "#eff6ff", border: "#bfdbfe", label: "A" }, // blue
-    { color: "#7c3aed", bg: "#f5f3ff", border: "#ddd6fe", label: "B" }, // purple
-    { color: "#059669", bg: "#ecfdf5", border: "#a7f3d0", label: "C" }, // green
-    { color: "#d97706", bg: "#fffbeb", border: "#fde68a", label: "D" }, // amber
-  ];
+  const handleScroll = () => {
+    if (!trackRef.current) return;
+    const pos = trackRef.current.scrollLeft;
+    const newIdx = Math.round(pos / (CARD_W + CARD_GAP));
+    setIdx(Math.max(0, Math.min(total - 1, newIdx)));
+  };
 
   return (
-    <div className="flex flex-col gap-4 max-w-2xl mx-auto px-4 pb-8">
-      {/* progress bar */}
-      <div className="flex items-center gap-3 py-2">
-        <div className="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden">
-          <motion.div
-            className="h-full rounded-full"
-            style={{ background: simulation.gradient }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5 }}
-          />
-        </div>
-        <span className="text-xs text-slate-500 font-semibold whitespace-nowrap">
-          {sceneIdx + 1} / {simulation.scenes.length}
-        </span>
-        <span
-          className="text-xs font-bold"
-          style={{ color: simulation.color }}
-        >
-          {score} pts
-        </span>
-      </div>
-
-      {/* scene art */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={sceneIdx}
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.4 }}
-        >
-          <SceneArt scene={scene} color={simulation.color} />
-        </motion.div>
-      </AnimatePresence>
-
-      {/* narrative */}
-      <motion.div
-        key={`narr-${sceneIdx}`}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm"
-      >
-        <p className="text-sm leading-relaxed text-slate-700">{scene.narrative}</p>
-        <p
-          className="mt-3 text-sm font-bold"
-          style={{ color: simulation.color }}
-        >
-          {scene.prompt}
-        </p>
-      </motion.div>
-
-      {/* choices */}
-      <div className="flex flex-col gap-3">
-        {scene.choices.map((choice, i) => {
-          const isChosen = chosen === i;
-          const isOther = chosen !== null && !isChosen;
-          const opt = OPTIONS[i % OPTIONS.length];
-
-          return (
-            <motion.button
-              key={i}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{
-                opacity: isOther ? 0.3 : 1,
-                y: 0,
-                scale: isChosen ? 1.03 : 1,
-              }}
-              transition={{ delay: i * 0.08, duration: 0.3 }}
-              whileHover={chosen === null ? { scale: 1.02, y: -2 } : {}}
-              whileTap={chosen === null ? { scale: 0.98 } : {}}
-              onClick={() => handleChoice(i)}
-              className="w-full rounded-2xl border-2 p-4 text-left transition-all"
-              style={{
-                background: isChosen ? opt.bg : `${opt.bg}cc`,
-                borderColor: isChosen ? opt.color : opt.border,
-                cursor: chosen === null ? "pointer" : "default",
-                boxShadow: isChosen
-                  ? `0 6px 24px ${opt.color}35`
-                  : `0 2px 8px ${opt.color}10`,
-              }}
-            >
-              <div className="flex items-start gap-3">
-                {/* Letter badge */}
-                <div
-                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-sm font-black shadow-sm transition-all"
-                  style={{
-                    background: isChosen ? opt.color : `${opt.color}20`,
-                    color: isChosen ? "white" : opt.color,
-                  }}
-                >
-                  {isChosen ? "✓" : opt.label}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  {/* emoji + text */}
-                  <div className="flex items-start gap-2">
-                    <span className="text-lg flex-shrink-0 leading-snug">{choice.emoji}</span>
-                    <p
-                      className="text-sm font-medium leading-snug pt-0.5"
-                      style={{ color: isChosen ? opt.color : "#1e293b" }}
-                    >
-                      {choice.text}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {/* feedback panel */}
+    <div className="relative">
+      {/* Arrows */}
       <AnimatePresence>
-        {showFeedback && chosen !== null && (
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="rounded-2xl p-4 border-2"
-            style={{
-              background: scene.choices[chosen].isGood ? "#f0fdf4" : "#fef3f2",
-              borderColor: scene.choices[chosen].isGood ? "#bbf7d0" : "#fecaca",
-            }}
+        {canPrev && (
+          <motion.button
+            initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}
+            onClick={() => go(-1)}
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center text-white shadow-xl font-black text-lg"
+            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.15)" }}
           >
-            <div className="flex items-start gap-3">
-              <span className="text-2xl flex-shrink-0">
-                {scene.choices[chosen].isGood ? "✅" : "💡"}
-              </span>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <p
-                    className="text-xs font-bold uppercase tracking-wide"
-                    style={{
-                      color: scene.choices[chosen].isGood ? "#16a34a" : "#dc2626",
-                    }}
-                  >
-                    {scene.choices[chosen].isGood ? "¡Decisión excelente!" : "Momento de aprender"}
-                  </p>
-                  <span
-                    className="rounded-full px-2 py-0.5 text-xs font-black text-white"
-                    style={{
-                      background: scene.choices[chosen].isGood ? "#16a34a" : "#ea580c",
-                    }}
-                  >
-                    +{scene.choices[chosen].points} pts
-                  </span>
-                </div>
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  {scene.choices[chosen].feedback}
-                </p>
-              </div>
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={handleNext}
-              className="mt-4 w-full rounded-xl py-3 text-sm font-bold text-white shadow"
-              style={{ background: simulation.gradient }}
-            >
-              {sceneIdx + 1 < simulation.scenes.length
-                ? "Continuar → Siguiente escena"
-                : "🎯 Ver mi resultado final"}
-            </motion.button>
-          </motion.div>
+            ‹
+          </motion.button>
         )}
       </AnimatePresence>
-    </div>
-  );
-}
 
-// ─── Intro screen ──────────────────────────────────────────
-function SimulationIntro({
-  simulation,
-  onStart,
-  onBack,
-}: {
-  simulation: Simulation;
-  onStart: () => void;
-  onBack: () => void;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-md mx-auto px-4 py-8 text-center"
-    >
-      <motion.div
-        animate={{ y: [0, -10, 0], rotate: [0, -5, 5, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="text-8xl mb-4"
-      >
-        {simulation.emoji}
-      </motion.div>
-
-      <div
-        className="inline-block rounded-full px-4 py-1.5 text-xs font-bold text-white mb-3"
-        style={{ background: simulation.gradient }}
-      >
-        Simulación de carrera
-      </div>
-
-      <h2 className="text-3xl font-black text-slate-900 mb-2">
-        {simulation.title}
-      </h2>
-      <p
-        className="text-sm font-semibold mb-5"
-        style={{ color: simulation.color }}
-      >
-        {simulation.tagline}
-      </p>
-
-      <div
-        className="rounded-2xl p-4 mb-6 text-left border"
-        style={{
-          background: `${simulation.color}08`,
-          borderColor: `${simulation.color}25`,
-        }}
-      >
-        <p className="text-sm text-slate-700 leading-relaxed">
-          {simulation.intro}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        {[
-          { n: simulation.scenes.length, label: "Escenas" },
-          { n: simulation.scenes.length * 3, label: "Decisiones" },
-          { n: "100", label: "Puntos máx." },
-        ].map((s) => (
-          <div
-            key={s.label}
-            className="rounded-xl p-3 border"
-            style={{
-              background: `${simulation.color}08`,
-              borderColor: `${simulation.color}20`,
-            }}
-          >
-            <p
-              className="text-xl font-black"
-              style={{ color: simulation.color }}
-            >
-              {s.n}
-            </p>
-            <p className="text-[10px] text-slate-500">{s.label}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onStart}
-          className="w-full rounded-xl py-4 text-base font-bold text-white shadow-xl"
-          style={{
-            background: simulation.gradient,
-            boxShadow: `0 12px 32px ${simulation.color}40`,
-          }}
-        >
-          🎬 Comenzar la simulación
-        </motion.button>
-        <button
-          onClick={onBack}
-          className="text-sm text-slate-500 hover:text-slate-700 transition"
-        >
-          ← Elegir otra carrera
-        </button>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── Career selector ───────────────────────────────────────
-function CareerSelector({
-  onSelect,
-}: {
-  onSelect: (sim: Simulation) => void;
-}) {
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-block rounded-full bg-gradient-to-r from-red-600 to-rose-500 px-4 py-1.5 text-xs font-bold text-white mb-3"
-        >
-          ✨ Simulador de carreras
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-3xl font-black text-slate-900 sm:text-4xl"
-        >
-          Vive la carrera antes de elegirla
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="mt-3 text-slate-500 text-sm sm:text-base max-w-xl mx-auto"
-        >
-          Toma decisiones reales como un profesional. Al final sabrás qué tan apto eres — del 0% al 100%.
-        </motion.p>
-      </div>
-
-      {/* ── Featured: Astronauta (real game) ── */}
-      <motion.a
-        href="/simular/astronauta"
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        whileHover={{ y: -4, scale: 1.01 }}
-        className="group relative mb-6 flex overflow-hidden rounded-3xl p-6 shadow-2xl cursor-pointer"
-        style={{
-          background: "radial-gradient(ellipse at top left, #0f0c29 0%, #000510 100%)",
-          border: "1.5px solid rgba(255,255,255,0.12)",
-          boxShadow: "0 20px 60px rgba(220,38,38,0.25)",
-          textDecoration: "none",
-        }}
-      >
-        {/* Stars background inside card */}
-        <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
-          {[...Array(30)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full bg-white"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: Math.random() * 2 + 0.5,
-                height: Math.random() * 2 + 0.5,
-                opacity: Math.random() * 0.7 + 0.2,
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-5 w-full">
-          <motion.div
-            animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="text-7xl flex-shrink-0"
-          >
-            🚀
-          </motion.div>
-
-          <div className="flex-1 text-center sm:text-left">
-            <div className="flex items-center gap-2 justify-center sm:justify-start mb-2">
-              <span className="rounded-full px-3 py-1 text-xs font-black text-white" style={{ background: "linear-gradient(135deg,#dc2626,#f97316)" }}>
-                🎮 JUEGO REAL
-              </span>
-              <span className="rounded-full px-3 py-1 text-xs font-bold text-white/80 border border-white/20">
-                Modo experimental
-              </span>
-            </div>
-            <h3 className="text-white text-2xl font-black mb-1">Astronauta — Misión Apolo X</h3>
-            <p className="text-white/60 text-sm leading-relaxed max-w-md">
-              No es una encuesta. Es un juego real: lanza el cohete con timing perfecto, esquiva asteroides en tiempo real, aterriza en la Luna con física real y recoge rocas lunares. ¿Tienes lo que se necesita?
-            </p>
-            <div className="flex flex-wrap gap-2 mt-3 justify-center sm:justify-start">
-              {["🚀 Lanzamiento", "☄️ Asteroides", "🌕 Aterrizaje", "🧑‍🚀 Paseo Lunar"].map((f) => (
-                <span key={f} className="rounded-full px-3 py-1 text-xs font-medium text-white/70" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                  {f}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex-shrink-0 flex items-center">
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="text-white/60 text-2xl group-hover:text-white transition"
-            >
-              →
-            </motion.div>
-          </div>
-        </div>
-      </motion.a>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-      >
-        {simulations.map((sim, i) => (
+      <AnimatePresence>
+        {canNext && (
           <motion.button
-            key={sim.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }}
+            onClick={() => go(1)}
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center text-white shadow-xl font-black text-lg"
+            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.15)" }}
+          >
+            ›
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Track */}
+      <div
+        ref={trackRef}
+        onScroll={handleScroll}
+        className="flex overflow-x-auto gap-4 pb-4 px-6"
+        style={{
+          scrollSnapType: "x mandatory",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {CAREER_CARDS.map((card, i) => (
+          <motion.a
+            key={card.id}
+            href={card.href}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + i * 0.07 }}
+            transition={{ delay: i * 0.06 }}
             whileHover={{ y: -6, scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => onSelect(sim)}
-            className="group relative overflow-hidden rounded-3xl p-5 text-left shadow-lg transition-shadow hover:shadow-xl"
+            className="relative shrink-0 flex flex-col overflow-hidden rounded-3xl shadow-xl"
             style={{
-              background: `linear-gradient(145deg, ${sim.color}15 0%, ${sim.color}05 100%)`,
-              border: `1.5px solid ${sim.color}25`,
+              width: CARD_W,
+              minHeight: card.id === "astronauta" ? 380 : 300,
+              background: card.bg,
+              border: `1.5px solid ${card.border}`,
+              scrollSnapAlign: "start",
+              textDecoration: "none",
             }}
           >
-            {/* glow */}
-            <div
-              className="absolute -right-6 -top-6 h-24 w-24 rounded-full blur-2xl opacity-30 transition-opacity group-hover:opacity-50"
-              style={{ background: sim.color }}
-            />
+            {/* Astronauta: star field */}
+            {card.id === "astronauta" && (
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                {ASTRO_STARS.map((s) => (
+                  <div key={s.id} className="absolute rounded-full bg-white"
+                    style={{ left: `${s.left}%`, top: `${s.top}%`, width: s.w, height: s.w, opacity: s.opacity }} />
+                ))}
+              </div>
+            )}
 
-            <div className="relative z-10">
-              <div className="mb-3 flex items-start justify-between">
-                <motion.span
-                  className="text-5xl"
-                  animate={{ rotate: [0, -5, 5, 0] }}
-                  transition={{
-                    duration: 4 + i,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: i * 0.5,
-                  }}
-                >
-                  {sim.emoji}
-                </motion.span>
-                <span
-                  className="rounded-full px-2 py-1 text-[10px] font-bold text-white"
-                  style={{ background: sim.gradient }}
-                >
-                  {sim.scenes.length} escenas
+            {/* Career-specific SVG layers */}
+            {card.svgType === "ecg" && <EcgLayer />}
+            {card.svgType === "grid" && <GridLayer />}
+            {card.svgType === "matrix" && <MatrixLayer />}
+            {card.svgType === "flame" && <FlameLayer />}
+
+            {/* Emoji decorations */}
+            {card.decos.map((d, di) => (
+              <div key={di}
+                className="absolute pointer-events-none select-none"
+                style={{
+                  left: `${d.x}%`,
+                  top: `${d.y}%`,
+                  fontSize: `${d.s}rem`,
+                  opacity: d.o,
+                  color: d.color,
+                  fontFamily: d.color ? "monospace" : undefined,
+                  fontWeight: d.color ? "bold" : undefined,
+                  lineHeight: 1,
+                  userSelect: "none",
+                }}
+              >
+                {d.t}
+              </div>
+            ))}
+
+            {/* Highlight shimmer */}
+            {card.id !== "astronauta" && (
+              <div className="absolute -right-8 -top-8 w-28 h-28 rounded-full blur-3xl"
+                style={{ background: "rgba(255,255,255,0.15)" }} />
+            )}
+
+            {/* Card content */}
+            <div className="relative z-10 flex flex-col h-full p-5">
+              {/* Badge */}
+              <div className="flex items-center justify-between mb-3">
+                <span className="rounded-full px-2.5 py-1 text-[10px] font-black text-white"
+                  style={{ background: card.gradient }}>
+                  {card.badge}
                 </span>
+                {card.id === "astronauta" && (
+                  <span className="rounded-full px-2 py-1 text-[10px] font-bold text-white/70 border border-white/20">
+                    Modo experimental
+                  </span>
+                )}
               </div>
 
-              <h3 className="text-base font-black text-slate-900 mb-1">
-                {sim.title}
+              {/* Emoji */}
+              <motion.div
+                className="text-6xl mb-3"
+                animate={card.id === "astronauta"
+                  ? { y: [0, -10, 0], rotate: [0, 4, -4, 0] }
+                  : { rotate: [0, -4, 4, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
+              >
+                {card.emoji}
+              </motion.div>
+
+              {/* Title + tagline */}
+              <h3 className="font-black text-lg mb-1 text-white">
+                {card.title}
               </h3>
-              <p className="text-xs text-slate-500 leading-snug line-clamp-2">
-                {sim.tagline}
+              <p className="text-xs leading-snug mb-3 flex-1 text-white/55">
+                {card.tagline}
               </p>
 
-              <div
-                className="mt-4 flex items-center gap-2 text-xs font-bold"
-                style={{ color: sim.color }}
-              >
-                <span>Simular ahora</span>
-                <motion.span
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  →
-                </motion.span>
+              {/* Feature pills (astronauta only) */}
+              {card.features.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {card.features.map((f) => (
+                    <span key={f} className="rounded-full px-2 py-0.5 text-[10px] font-medium text-white/70"
+                      style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* CTA */}
+              <div className="flex items-center gap-1.5 text-xs font-bold mt-auto text-white/80">
+                <span>Jugar ahora</span>
+                <motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
               </div>
             </div>
-          </motion.button>
+          </motion.a>
         ))}
-      </motion.div>
+
+        {/* trailing spacer */}
+        <div className="shrink-0 w-4" />
+      </div>
+
+      {/* Dot indicators */}
+      <div className="flex justify-center gap-1.5 mt-3 pb-2">
+        {CAREER_CARDS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => go(i - idx)}
+            className="rounded-full transition-all"
+            style={{
+              width: i === idx ? 20 : 6,
+              height: 6,
+              background: i === idx ? "#dc2626" : "rgba(0,0,0,0.2)",
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
-// ─── Page root ─────────────────────────────────────────────
-type Phase = "select" | "intro" | "playing" | "result";
-
+// ─── Page root ────────────────────────────────────────────────
 export default function SimularPage() {
-  const [phase, setPhase] = useState<Phase>("select");
-  const [selected, setSelected] = useState<Simulation | null>(null);
-  const [finalScore, setFinalScore] = useState(0);
-  const [finalMax, setFinalMax] = useState(100);
-
-  const handleSelect = (sim: Simulation) => {
-    setSelected(sim);
-    setPhase("intro");
-  };
-
-  const handleStart = () => setPhase("playing");
-
-  const handleFinish = (score: number, max: number) => {
-    setFinalScore(score);
-    setFinalMax(max);
-    setPhase("result");
-  };
-
-  const handleRetry = () => {
-    setFinalScore(0);
-    setPhase("intro");
-  };
-
-  const handleExit = () => {
-    setSelected(null);
-    setFinalScore(0);
-    setPhase("select");
-  };
-
   return (
     <main
       className="min-h-screen"
@@ -804,100 +497,60 @@ export default function SimularPage() {
       {/* Top nav */}
       <div className="sticky top-0 z-30 border-b border-white/60 bg-white/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-4xl items-center gap-4 px-4 py-3">
-          <a
-            href="/"
-            className="flex items-center gap-2 text-slate-600 transition hover:text-red-600"
-          >
+          <a href="/" className="flex items-center gap-2 text-slate-600 transition hover:text-red-600">
             <span className="text-lg">←</span>
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-red-600 to-rose-500 text-white text-sm font-black shadow">
               VT
             </div>
           </a>
-
           <div className="flex-1">
-            <h1 className="text-sm font-extrabold text-slate-900">
-              Simular Carrera
-            </h1>
-            {selected && (
-              <p className="text-xs text-slate-500">{selected.title}</p>
-            )}
+            <h1 className="text-sm font-extrabold text-slate-900">Simular Carrera</h1>
+            <p className="text-xs text-slate-500">Desliza y elige tu carrera</p>
           </div>
-
-          {selected && phase !== "select" && (
-            <button
-              onClick={handleExit}
-              className="text-xs text-slate-500 hover:text-red-600 transition font-medium"
-            >
-              Cambiar carrera
-            </button>
-          )}
         </div>
-
-        {/* progress strip for playing */}
-        {phase === "playing" && selected && (
-          <div
-            className="h-0.5 transition-all"
-            style={{ background: selected.gradient }}
-          />
-        )}
       </div>
 
-      {/* Content */}
-      <AnimatePresence mode="wait">
-        {phase === "select" && (
-          <motion.div
-            key="select"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <CareerSelector onSelect={handleSelect} />
-          </motion.div>
-        )}
+      {/* Hero */}
+      <div className="text-center px-4 pt-8 pb-6 max-w-2xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-block rounded-full bg-gradient-to-r from-red-600 to-rose-500 px-4 py-1.5 text-xs font-bold text-white mb-3"
+        >
+          🎮 {CAREER_CARDS.length} carreras — Juego real
+        </motion.div>
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-3xl sm:text-4xl font-black text-slate-900 mb-3"
+        >
+          Vive la carrera antes de elegirla
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-slate-500 text-sm sm:text-base"
+        >
+          No encuestas — juegos reales. Toma decisiones como un profesional y descubre tu aptitud del 0% al 100%.
+        </motion.p>
+      </div>
 
-        {phase === "intro" && selected && (
-          <motion.div
-            key="intro"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <SimulationIntro
-              simulation={selected}
-              onStart={handleStart}
-              onBack={handleExit}
-            />
-          </motion.div>
-        )}
+      {/* Carousel */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="max-w-5xl mx-auto"
+      >
+        <Carousel />
+      </motion.div>
 
-        {phase === "playing" && selected && (
-          <motion.div
-            key="playing"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <SimulationGame simulation={selected} onFinish={handleFinish} />
-          </motion.div>
-        )}
-
-        {phase === "result" && selected && (
-          <motion.div
-            key="result"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <ResultScreen
-              simulation={selected}
-              score={finalScore}
-              maxScore={finalMax}
-              onRetry={handleRetry}
-              onExit={handleExit}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Bottom hint */}
+      <p className="text-center text-slate-400 text-xs pb-8 mt-2">
+        ← Desliza para ver todas las carreras →
+      </p>
     </main>
   );
 }
