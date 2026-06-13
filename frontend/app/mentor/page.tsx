@@ -5,6 +5,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { careers, type Career } from "@/lib/careers";
 import Navbar from "@/components/Navbar";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../src/firebase/config";
+import { db } from "../../src/firebase/config";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 type Message = {
   role: "user" | "assistant";
@@ -266,12 +270,53 @@ export default function MentorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [mentorInfo, setMentorInfo] = useState<MentorInfo | null>(null);
   const [started, setStarted] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUserId(user?.uid || null);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const saveChatHistory = useCallback(
+    async (careerId: string, msgs: Message[]) => {
+      if (!userId) return;
+      const docId = `${userId}_${careerId}`;
+      const docRef = doc(db, "ChatHistories", docId);
+      await setDoc(
+        docRef,
+        {
+          userId,
+          careerId,
+          messages: msgs,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    },
+    [userId]
+  );
+
+  const loadChatHistory = useCallback(
+    async (careerId: string): Promise<Message[]> => {
+      if (!userId) return [];
+      const docId = `${userId}_${careerId}`;
+      const docRef = doc(db, "ChatHistories", docId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        return docSnap.data().messages || [];
+      }
+      return [];
+    },
+    [userId]
+  );
 
   useEffect(() => {
     scrollToBottom();
@@ -289,17 +334,25 @@ export default function MentorPage() {
     setIsLoading(true);
 
     try {
+      const existingMessages = await loadChatHistory(careerId);
+
+      if (existingMessages.length > 0) {
+        setMessages(existingMessages);
+        setIsLoading(false);
+        return;
+      }
+
+      const initialUserMessage: Message = {
+        role: "user",
+        content:
+          "Hola, estoy listo para comenzar la entrevista. Por favor preséntate y empecemos.",
+      };
+
       const res = await fetch(`${MENTOR_API_URL}/api/mentor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [
-            {
-              role: "user",
-              content:
-                "Hola, estoy listo para comenzar la entrevista. Por favor preséntate y empecemos.",
-            },
-          ],
+          messages: [initialUserMessage],
           careerId,
         }),
       });
@@ -345,21 +398,26 @@ export default function MentorPage() {
       if (!assistantContent) {
         throw new Error("No se recibió respuesta del mentor");
       }
+
+      const finalMessages: Message[] = [
+        initialUserMessage,
+        { role: "assistant", content: assistantContent },
+      ];
+      await saveChatHistory(careerId, finalMessages);
     } catch (error) {
-      setMessages([
-        {
-          role: "assistant",
-          content:
-            "Hubo un error al conectar. Verifica que el backend esté corriendo en " +
-            MENTOR_API_URL +
-            ". Error: " +
-            (error instanceof Error ? error.message : "desconocido"),
-        },
-      ]);
+      const errorMsg: Message = {
+        role: "assistant",
+        content:
+          "Hubo un error al conectar. Verifica que el backend esté corriendo en " +
+          MENTOR_API_URL +
+          ". Error: " +
+          (error instanceof Error ? error.message : "desconocido"),
+      };
+      setMessages([errorMsg]);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [loadChatHistory, saveChatHistory]);
 
   const sendMessage = useCallback(async () => {
     if (!input.trim() || isLoading || !selectedCareerId) return;
@@ -421,21 +479,27 @@ export default function MentorPage() {
       if (!assistantContent) {
         throw new Error("No se recibió respuesta del mentor");
       }
-    } catch (error) {
-      setMessages([
+
+      const finalMessages: Message[] = [
         ...newMessages,
-        {
-          role: "assistant",
-          content:
-            "Disculpa, tuve un problema técnico. Verifica que el backend esté corriendo. (" +
-            (error instanceof Error ? error.message : "error") +
-            ")",
-        },
-      ]);
+        { role: "assistant", content: assistantContent },
+      ];
+      await saveChatHistory(selectedCareerId, finalMessages);
+    } catch (error) {
+      const errorMsg: Message = {
+        role: "assistant",
+        content:
+          "Disculpa, tuve un problema técnico. Verifica que el backend esté corriendo. (" +
+          (error instanceof Error ? error.message : "error") +
+          ")",
+      };
+      const errorMessages = [...newMessages, errorMsg];
+      setMessages(errorMessages);
+      await saveChatHistory(selectedCareerId, errorMessages);
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, selectedCareerId]);
+  }, [input, isLoading, messages, selectedCareerId, saveChatHistory]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
