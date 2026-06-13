@@ -1,15 +1,12 @@
 ﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/src/firebase/config";
-import { logout } from "@/src/services/authService";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/src/firebase/config";
-﻿import Navbar from "@/components/Navbar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import Navbar from "@/components/Navbar";
 import {
   Card,
   CardContent,
@@ -95,26 +92,9 @@ export default function ResourcesPage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const pathname = usePathname();
-  const isHome = pathname === "/";
-
-  const getInitials = (name: string, fallback: string) => {
-    const source = name?.trim() || fallback?.trim() || "";
-    const words = source.split(/\s+/).filter(Boolean);
-    if (words.length >= 2) {
-      return `${words[0][0]}${words[1][0]}`.toUpperCase();
-    }
-    return source.slice(0, 2).toUpperCase();
-  };
-
-  const initials = getInitials(userName, userEmail);
-  const displayName = userName || userEmail;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setIsAuthenticated(!!user);
       if (!user) {
         setUserEmail("");
         setUserName("");
@@ -144,120 +124,6 @@ export default function ResourcesPage() {
         <div className="absolute bottom-0 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-orange-300/25 blur-3xl" />
       </div>
 
-      <header className="relative z-50 border-b border-white/50 bg-white/50 backdrop-blur-xl animate-fade-up">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-red-600 to-rose-500 text-white shadow-lg shadow-red-500/25 animate-bounce-in">
-              <span className="text-lg font-black">VT</span>
-            </div>
-            <div className="animate-slide-in-left animate-delay-100">
-              <p className="text-lg font-extrabold tracking-tight text-slate-950">
-                Vocatio
-              </p>
-              <p className="text-xs text-slate-500">
-                Tu camino vocacional con UTP Perú
-              </p>
-            </div>
-          </div>
-
-          <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 lg:flex animate-fade-up animate-delay-100">
-            <a
-              className="text-red-700 transition-colors duration-300 hover:text-red-500"
-              href={isHome ? "#inicio" : "/#inicio"}
-              onClick={(e) => {
-                if (isHome) {
-                  e.preventDefault();
-                  document
-                    .getElementById("inicio")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-            >
-              Inicio
-            </a>
-            <a className="transition-colors hover:text-red-500" href="/test">
-              Test Vocacional
-            </a>
-            <a
-              className="transition-colors hover:text-red-500"
-              href="/carreras"
-            >
-              Explorar Carreras
-            </a>
-            <a className="transition-colors hover:text-red-500" href="/#mentor">
-              Mentor IA
-            </a>
-            <a
-              className="transition-colors hover:text-red-500"
-              href="/recursos"
-            >
-              Recursos
-            </a>
-            <a
-              className="transition-colors hover:text-red-500"
-              href="/#comunidad"
-            >
-              Comunidad
-            </a>
-          </nav>
-
-          <div className="relative flex items-center gap-4 animate-slide-in-right animate-delay-200">
-            <div className="hidden md:flex flex-col text-right">
-              <span className="text-sm font-semibold text-slate-900">
-                {isAuthenticated ? `Bienvenido` : "Invitado"}
-              </span>
-
-              <span className="text-xs text-slate-500">{isAuthenticated ? userEmail : ""}</span>
-            </div>
-
-            {isAuthenticated ? (
-              <div className="relative">
-                <button
-                  type="button"
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-red-600 text-sm font-bold text-white shadow-lg shadow-red-500/30 transition-transform duration-200 hover:scale-105"
-                  onClick={() => setMenuOpen((open) => !open)}
-                >
-                  {initials || "U"}
-                </button>
-                {menuOpen ? (
-                  <div className="absolute right-0 top-14 z-50 w-44 rounded-3xl border border-slate-200 bg-white p-2 shadow-xl">
-                    <button
-                      type="button"
-                      className="w-full rounded-2xl px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                      onClick={() => {
-                        setMenuOpen(false);
-                        router.push("/perfil");
-                      }}
-                    >
-                      Ver perfil
-                    </button>
-                    <button
-                      type="button"
-                      className="mt-2 w-full rounded-2xl px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                      onClick={async () => {
-                        setMenuOpen(false);
-                        await logout();
-                        router.push("/login");
-                      }}
-                    >
-                      Cerrar sesión
-                    </button>
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <Button variant="outline" size="lg">
-                  Iniciar sesión
-                </Button>
-                <Button size="lg" className="shadow-[0_16px_40px_rgba(220,38,38,0.28)] transition-transform hover:scale-105">
-                  Registrarme
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
       <Navbar />
 
       <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12 lg:px-8 lg:py-20 animate-fade-up">
