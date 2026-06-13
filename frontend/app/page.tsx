@@ -65,7 +65,7 @@ useEffect(() => {
 
     setUserEmail(user.email || "");
 
-    const docRef = doc(db, "usuarios", user.uid);
+    const docRef = doc(db, "Usuarios", user.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
