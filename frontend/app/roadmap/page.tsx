@@ -1,6 +1,7 @@
 "use client";
 
 import { careerResults } from "@/lib/questions";
+import { apiFetch } from "@/lib/api";
 import {
   roadmapData,
   type CareerRoadmap,
@@ -28,8 +29,6 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import Navbar from "@/components/Navbar";
-
-const API_BASE = "http://127.0.0.1:8000";
 
 type NodeData = {
   label: string;
@@ -259,7 +258,7 @@ function RoadmapPageInner() {
     let cancelled = false;
     async function fetchMalla() {
       try {
-        const res = await fetch(`${API_BASE}/api/scrape/${careerKey}`);
+        const res = await apiFetch(`/api/scrape/${careerKey}`);
         if (!res.ok) throw new Error(`API error ${res.status}`);
         const json = await res.json();
         if (!cancelled) {

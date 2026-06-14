@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 
 from careers import CAREERS
 from scraper import MallaScraper
@@ -7,15 +8,23 @@ from firestore_service import get_all_careers, get_career as fb_get_career, set_
 from community_router import router as community_router
 from mentor_router import router as mentor_router
 from badges_router import router as badges_router
+from auth_middleware import APIKeyMiddleware
+
+load_dotenv()
 
 app = FastAPI(title="Vocatio Scraper API", version="2.0.0")
 
+# CORS - Allow only frontend origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
+
+# API Key authentication
+app.add_middleware(APIKeyMiddleware)
 
 app.include_router(community_router)
 app.include_router(mentor_router)

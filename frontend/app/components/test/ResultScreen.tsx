@@ -10,7 +10,7 @@ import { trackBadgeEvent, showBadgeNotification } from "@/src/services/badgeServ
 type Result = {
   title?: string; desc?: string;
   match?: number; color?: string; emoji?: string;
-  careerKey: string;
+  careerKey: Career;
   insufficient?: boolean;
   answered?: number;
 };
@@ -43,6 +43,42 @@ export default function ResultScreen({
     const t = setTimeout(() => setShowAvatar(true), 1200);
     return () => clearTimeout(t);
   }, [result.insufficient]);
+
+  // Guarda el resultado en Firestore una sola vez.
+  // El localStorage actúa como candado atómico: el primero en llegar elimina
+  // la clave y guarda; el segundo invocación (React Strict Mode) no encuentra
+  // la clave y sale sin duplicar.
+  useEffect(() => {
+    const save = async () => {
+      const { TEST_SESSION_KEY } = await import("@/app/components/test/useTestLogic");
+      const session = localStorage.getItem(TEST_SESSION_KEY);
+      if (!session) return;            // ya guardado o test sin sesión activa
+      localStorage.removeItem(TEST_SESSION_KEY); // candado: eliminar antes de guardar
+
+      const fbUser = auth.currentUser;
+      if (!fbUser) return;
+
+      let col = "Usuarios";
+      for (const c of ["Usuarios", "usuarios"]) {
+        try {
+          const snap = await getDoc(doc(db, c, fbUser.uid));
+          if (snap.exists()) { col = c; break; }
+        } catch { /* ignore */ }
+      }
+      await addDoc(collection(db, col, fbUser.uid, "historialTests"), {
+        careerKey:    result.careerKey,
+        careerTitle:  result.title      ?? null,
+        careerEmoji:  result.emoji      ?? null,
+        match:        result.match      ?? null,
+        score,
+        insufficient: result.insufficient ?? false,
+        answered:     result.answered   ?? 10,
+        completedAt:  serverTimestamp(),
+      });
+    };
+    save().catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Badge: test completado
   useEffect(() => {

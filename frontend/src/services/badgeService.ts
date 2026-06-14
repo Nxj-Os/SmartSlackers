@@ -1,10 +1,8 @@
 import { UserBadgeResponse } from "@/lib/badges";
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_MENTOR_API_URL || "http://127.0.0.1:8000";
+import { apiFetch } from "@/lib/api";
 
 export async function fetchUserBadges(userId: string): Promise<UserBadgeResponse> {
-  const res = await fetch(`${API_BASE}/api/badges/user/${userId}`);
+  const res = await apiFetch(`/api/badges/user/${userId}`);
   if (!res.ok) throw new Error("Error fetching badges");
   return res.json();
 }
@@ -14,7 +12,7 @@ export async function trackBadgeEvent(
   event: string,
   value: number = 1,
 ): Promise<{ newBadges: { id: string; title: string; icon: string; xp: number }[] }> {
-  const res = await fetch(`${API_BASE}/api/badges/track`, {
+  const res = await apiFetch(`/api/badges/track`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId, event, value }),

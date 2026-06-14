@@ -5,11 +5,20 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
 import { careers, type Career } from "@/lib/careers";
+import {
+  showBadgeNotification,
+  trackBadgeEvent,
+} from "@/src/services/badgeService";
+import { apiFetch } from "@/lib/api";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../src/firebase/config";
-import { db } from "../../src/firebase/config";
-import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
-import { trackBadgeEvent, showBadgeNotification } from "@/src/services/badgeService";
+import {
+  deleteDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
+import { auth, db } from "../../src/firebase/config";
 
 type Message = {
   role: "user" | "assistant";
@@ -20,9 +29,6 @@ type MentorInfo = {
   name: string;
   title: string;
 };
-
-const MENTOR_API_URL =
-  process.env.NEXT_PUBLIC_MENTOR_API_URL || "http://127.0.0.1:8000";
 
 const MENTOR_CAREERS = [
   {
@@ -430,8 +436,13 @@ export default function MentorPage() {
   const [showClearModal, setShowClearModal] = useState(false);
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef   = useRef<HTMLDivElement>(null);
+  const inputRef         = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef   = useRef<{ stop: () => void } | null>(null);
+  const isMutedRef       = useRef(false);
+
+  const [isMuted, setIsMuted]       = useState(false);
+  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -443,6 +454,72 @@ export default function MentorPage() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // ── Sincroniza isMutedRef y cancela audio al silenciar ──
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+    if (isMuted && typeof window !== "undefined") window.speechSynthesis?.cancel();
+  }, [isMuted]);
+
+  // Limpia audio al desmontar
+  useEffect(() => {
+    return () => { if (typeof window !== "undefined") window.speechSynthesis?.cancel(); };
+  }, []);
+
+  // ── TTS: voz robótica para respuestas del mentor ──
+  const speak = useCallback((text: string) => {
+    if (isMutedRef.current || typeof window === "undefined") return;
+    window.speechSynthesis.cancel();
+    const utterance  = new SpeechSynthesisUtterance(text);
+    utterance.lang   = "es-PE";
+    utterance.pitch  = 0.75;
+    utterance.rate   = 0.88;
+    utterance.volume = 1;
+    const trySpeak = () => {
+      const voices  = window.speechSynthesis.getVoices();
+      const esVoice = voices.find((v) => v.lang.startsWith("es"));
+      if (esVoice) utterance.voice = esVoice;
+      window.speechSynthesis.speak(utterance);
+    };
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = trySpeak;
+    } else {
+      trySpeak();
+    }
+  }, []);
+
+  // ── STT: micrófono del usuario ──
+  const startListening = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR = typeof window !== "undefined"
+      ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
+      : null;
+    if (!SR) return;
+    window.speechSynthesis?.cancel();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recognition: any = new SR();
+    recognition.lang           = "es-PE";
+    recognition.interimResults = true;
+    recognition.continuous     = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      let transcript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      setInput(transcript);
+    };
+    recognition.onend   = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    recognition.start();
+    recognitionRef.current = recognition;
+    setIsListening(true);
+  }, []);
+
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }, []);
 
   const saveChatHistory = useCallback(
     async (careerId: string, msgs: Message[]) => {
@@ -523,7 +600,7 @@ export default function MentorPage() {
             "Hola, estoy listo para comenzar la entrevista. Por favor preséntate y empecemos.",
         };
 
-        const res = await fetch(`${MENTOR_API_URL}/api/mentor`, {
+        const res = await apiFetch(`/api/mentor`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -578,6 +655,8 @@ export default function MentorPage() {
           throw new Error("El mentor no devolvió una respuesta válida.");
         }
 
+        speak(assistantContent);
+
         const finalMessages: Message[] = [
           initialUserMessage,
           { role: "assistant", content: assistantContent },
@@ -595,7 +674,7 @@ export default function MentorPage() {
         setIsLoading(false);
       }
     },
-    [loadChatHistory, saveChatHistory],
+    [loadChatHistory, saveChatHistory, speak],
   );
 
   const sendMessage = useCallback(async () => {
@@ -610,7 +689,7 @@ export default function MentorPage() {
     setConnectionError(null);
 
     try {
-      const res = await fetch(`${MENTOR_API_URL}/api/mentor`, {
+      const res = await apiFetch(`/api/mentor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -662,6 +741,8 @@ export default function MentorPage() {
         throw new Error("El mentor no devolvió una respuesta válida.");
       }
 
+      speak(assistantContent);
+
       const finalMessages: Message[] = [
         ...newMessages,
         { role: "assistant", content: assistantContent },
@@ -689,7 +770,7 @@ export default function MentorPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, selectedCareerId, saveChatHistory]);
+  }, [input, isLoading, messages, selectedCareerId, saveChatHistory, speak]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -753,6 +834,19 @@ export default function MentorPage() {
           </div>
 
           <div className="ml-auto flex items-center gap-2">
+            {/* Botón mute/unmute TTS */}
+            <button
+              onClick={() => setIsMuted((m) => !m)}
+              title={isMuted ? "Activar voz del mentor" : "Silenciar voz del mentor"}
+              className={`flex h-8 w-8 items-center justify-center rounded-lg border text-sm transition ${
+                isMuted
+                  ? "border-slate-200 bg-white text-slate-400 hover:text-slate-600"
+                  : "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+              }`}
+            >
+              {isMuted ? "🔇" : "🔊"}
+            </button>
+
             <button
               onClick={() => setShowClearModal(true)}
               className="flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600 hover:border-red-200"
@@ -872,16 +966,20 @@ export default function MentorPage() {
       {/* Input Area */}
       <div className="border-t border-white/60 bg-white/80 backdrop-blur-xl">
         <div className="mx-auto max-w-4xl px-4 py-3">
-          <div className="flex items-end gap-3">
+          <div className="flex items-end gap-2">
             <div className="relative flex-1">
               <textarea
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Escribe tu respuesta..."
+                placeholder={isListening ? "🎙️ Escuchando..." : "Escribe tu respuesta..."}
                 rows={1}
-                className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-800 shadow-sm outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                className={`w-full resize-none rounded-xl border bg-white px-4 py-3 text-sm text-slate-800 shadow-sm outline-none transition focus:ring-2 ${
+                  isListening
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-200 animate-pulse"
+                    : "border-slate-200 focus:border-red-400 focus:ring-red-100"
+                }`}
                 style={{ minHeight: "44px", maxHeight: "120px" }}
                 onInput={(e) => {
                   const target = e.target as HTMLTextAreaElement;
@@ -891,6 +989,22 @@ export default function MentorPage() {
                 }}
               />
             </div>
+
+            {/* Botón de micrófono */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={isListening ? stopListening : startListening}
+              title={isListening ? "Detener grabación" : "Hablar con el mentor"}
+              className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-lg shadow-sm transition-all ${
+                isListening
+                  ? "bg-red-600 text-white shadow-red-500/40 shadow-lg ring-4 ring-red-200"
+                  : "border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-red-600"
+              }`}
+            >
+              {isListening ? "⏹" : "🎙️"}
+            </motion.button>
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

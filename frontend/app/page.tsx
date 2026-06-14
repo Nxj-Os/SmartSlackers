@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import MiniMentorWidget from "@/app/components/MiniMentorWidget";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -517,6 +518,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <MiniMentorWidget />
 
       <section className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-16 lg:px-8 lg:pb-24">
         <div className="grid gap-4 rounded-4xl bg-linear-to-r from-red-700 via-rose-700 to-orange-600 p-6 text-white shadow-[0_24px_70px_rgba(220,38,38,0.28)] sm:grid-cols-2 lg:grid-cols-4 lg:p-8">

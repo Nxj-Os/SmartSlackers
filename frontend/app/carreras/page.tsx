@@ -2,6 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import { AREAS, careers as staticCareers, type Career } from "@/lib/careers";
+import { apiFetch } from "@/lib/api";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState, useCallback } from "react";
 import { collection, getDocs, query, where, limit } from "firebase/firestore";
@@ -9,9 +10,6 @@ import { db } from "@/src/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/src/firebase/config";
 import { trackBadgeEvent, showBadgeNotification } from "@/src/services/badgeService";
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_MENTOR_API_URL || "http://127.0.0.1:8000";
 
 function getNowActivity(dayInLife: Career["dayInLife"]) {
   const h = new Date().getHours();
@@ -506,10 +504,16 @@ function CareerCard({
   career,
   onClick,
   selected,
+  compareSelected,
+  compareMode,
+  compareIndex,
 }: {
   career: Career;
   onClick: () => void;
   selected: boolean;
+  compareSelected?: boolean;
+  compareMode?: boolean;
+  compareIndex?: number;
 }) {
   return (
     <motion.button
@@ -519,11 +523,14 @@ function CareerCard({
       onClick={onClick}
       className="group relative w-full rounded-2xl border p-4 text-left transition-shadow"
       style={{
-        background: selected ? career.color + "12" : "rgba(255,255,255,0.9)",
-        borderColor: selected ? career.color + "60" : "#fee2e2",
-        boxShadow: selected
+        background: compareSelected ? career.color + "18" : selected ? career.color + "12" : "rgba(255,255,255,0.9)",
+        borderColor: compareSelected ? career.color : selected ? career.color + "60" : "#fee2e2",
+        boxShadow: compareSelected
+          ? `0 8px 32px ${career.color}30`
+          : selected
           ? `0 8px 32px ${career.color}25`
           : "0 2px 8px rgba(220,38,38,0.06)",
+        borderWidth: compareSelected ? 2 : 1,
       }}
     >
       <div className="flex items-start gap-3">
@@ -554,7 +561,7 @@ function CareerCard({
         <span className="text-xs text-slate-400">{career.duration}</span>
       </div>
 
-      {selected && (
+      {selected && !compareMode && (
         <motion.div
           layoutId="selected-indicator"
           className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-black text-white"
@@ -563,7 +570,181 @@ function CareerCard({
           ✓
         </motion.div>
       )}
+      {compareSelected && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-black text-white"
+          style={{ background: career.color }}
+        >
+          {compareIndex !== undefined ? compareIndex + 1 : ""}
+        </motion.div>
+      )}
     </motion.button>
+  );
+}
+
+function ComparePanel({
+  careers,
+  onClose,
+}: {
+  careers: Career[];
+  onClose: () => void;
+}) {
+  const maxSalary = Math.max(...careers.map((c) => c.salaryMin));
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 40 }}
+      transition={{ type: "spring", stiffness: 280, damping: 30 }}
+      className="rounded-3xl border border-red-100 bg-white shadow-2xl overflow-hidden"
+    >
+      {/* Header */}
+      <div className="relative bg-gradient-to-r from-red-600 via-rose-600 to-orange-500 px-6 py-5 text-white">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white shadow-sm transition hover:bg-white/30"
+        >
+          ✕
+        </button>
+        <h2 className="text-xl font-black">⚡ Comparar Carreras</h2>
+        <p className="text-red-100 text-sm mt-1">{careers.length} carreras seleccionadas</p>
+      </div>
+
+      {/* Careers stacked vertically — each career is a full-width card */}
+      <div className="divide-y divide-slate-100">
+        {careers.map((c) => {
+          const now = getNowActivity(c.dayInLife);
+          return (
+            <div key={c.id} className="p-5 transition hover:bg-slate-50/50">
+              {/* Career header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-2xl transition-transform hover:scale-110"
+                  style={{ background: c.color + "15" }}
+                >
+                  {c.emoji}
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">{c.title}</h3>
+                  <span
+                    className="inline-block rounded-full px-2 py-0.5 text-[10px] font-medium"
+                    style={{ background: c.color + "15", color: c.color }}
+                  >
+                    {c.area}
+                  </span>
+                </div>
+              </div>
+
+              {/* Data rows for this career */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {/* Salary */}
+                <div className="rounded-xl bg-slate-50 p-3 transition hover:shadow-md hover:-translate-y-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 mb-1">Salario</p>
+                  <p className="text-sm font-black text-slate-900">{c.salary}</p>
+                  <div className="mt-1.5 h-1.5 rounded-full bg-red-100 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(c.salaryMin / maxSalary) * 100}%` }}
+                      transition={{ duration: 0.8, delay: 0.2 }}
+                      className="h-full rounded-full"
+                      style={{ background: `linear-gradient(90deg, ${c.color}, ${c.color}99)` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Duration */}
+                <div className="rounded-xl bg-slate-50 p-3 transition hover:shadow-md hover:-translate-y-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 mb-1">Duración</p>
+                  <p className="text-sm font-bold text-slate-800">{c.duration}</p>
+                </div>
+
+                {/* Outlook */}
+                <div className="rounded-xl bg-slate-50 p-3 transition hover:shadow-md hover:-translate-y-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 mb-1">Demanda</p>
+                  <OutlookBadge outlook={c.outlook} />
+                </div>
+
+                {/* Skills */}
+                <div className="rounded-xl bg-slate-50 p-3 col-span-2 sm:col-span-3 lg:col-span-2 transition hover:shadow-md hover:-translate-y-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 mb-1.5">Habilidades</p>
+                  <div className="flex flex-wrap gap-1">
+                    {c.skills.map((s) => (
+                      <span
+                        key={s}
+                        className="rounded-md px-2 py-0.5 text-[10px] font-medium transition hover:scale-105 cursor-default"
+                        style={{ background: c.color + "12", color: c.color }}
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tools */}
+                <div className="rounded-xl bg-slate-50 p-3 col-span-2 sm:col-span-3 transition hover:shadow-md hover:-translate-y-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 mb-1.5">Herramientas</p>
+                  <div className="flex flex-wrap gap-1">
+                    {c.tools.map((t) => (
+                      <span
+                        key={t}
+                        className="rounded-md bg-slate-200/60 px-2 py-0.5 text-[10px] font-medium text-slate-700 transition hover:bg-slate-200 hover:scale-105 cursor-default"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Universities */}
+                <div className="rounded-xl bg-slate-50 p-3 col-span-2 sm:col-span-3 transition hover:shadow-md hover:-translate-y-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 mb-1">Universidades</p>
+                  <p className="text-xs text-slate-600 leading-relaxed">{c.universities.join(", ")}</p>
+                </div>
+              </div>
+
+              {/* Day in life */}
+              <div className="mt-3 rounded-xl border p-3 transition hover:shadow-md" style={{ borderColor: c.color + "25", background: c.color + "05" }}>
+                <p className="text-[10px] font-semibold uppercase tracking-wide mb-2" style={{ color: c.color }}>📅 Día a día</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                  {c.dayInLife.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] transition hover:bg-white/60 cursor-default"
+                      style={{
+                        background: item.time === now.time ? c.color + "18" : "transparent",
+                        fontWeight: item.time === now.time ? 600 : 400,
+                        border: item.time === now.time ? `1px solid ${c.color}30` : "1px solid transparent",
+                      }}
+                    >
+                      <span>{item.emoji}</span>
+                      <span className="text-slate-400 w-14 flex-shrink-0">{item.time}</span>
+                      <span className="text-slate-700 truncate">{item.activity}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="mt-3 flex gap-2">
+                <a
+                  href={`/laboratorios?career=${c.id}`}
+                  className="rounded-xl px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 hover:scale-105 hover:shadow-lg"
+                  style={{
+                    background: `linear-gradient(135deg, ${c.color}, ${c.color}cc)`,
+                    boxShadow: `0 4px 12px ${c.color}25`,
+                  }}
+                >
+                  🔬 Ver Laboratorio
+                </a>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </motion.div>
   );
 }
 
@@ -571,6 +752,9 @@ export default function CarrerasPage() {
   const [search, setSearch] = useState("");
   const [area, setArea] = useState("Todos");
   const [selected, setSelected] = useState<Career | null>(null);
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareList, setCompareList] = useState<Career[]>([]);
+  const [showComparePanel, setShowComparePanel] = useState(false);
   const [count, setCount] = useState(0);
   const [careersList, setCareersList] = useState<Career[]>(staticCareers);
 
@@ -597,11 +781,20 @@ export default function CarrerasPage() {
     }
   }, []);
 
+  const handleCompareToggle = useCallback((career: Career) => {
+    setCompareList((prev) => {
+      const exists = prev.find((c) => c.id === career.id);
+      if (exists) return prev.filter((c) => c.id !== career.id);
+      if (prev.length >= 3) return prev;
+      return [...prev, career];
+    });
+  }, []);
+
   // Fetch careers from backend API (Firestore-backed)
   useEffect(() => {
     const fetchCareers = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/v2/careers`);
+        const res = await apiFetch(`/api/v2/careers`);
         if (!res.ok) throw new Error("API error");
         const data = await res.json();
         if (data.careers && data.careers.length > 0) {
@@ -677,36 +870,63 @@ export default function CarrerasPage() {
           </div>
         </motion.div>
 
-        {/* Area filter pills */}
-        <div className="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {AREAS.map((a) => (
-            <motion.button
-              key={a}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setArea(a)}
-              className="flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition"
-              style={
-                area === a
-                  ? {
-                      background: "linear-gradient(135deg, #dc2626, #f87171)",
-                      color: "white",
-                      boxShadow: "0 4px 16px rgba(220,38,38,0.3)",
-                    }
-                  : {
-                      background: "rgba(255,255,255,0.8)",
-                      color: "#64748b",
-                      border: "1px solid #fee2e2",
-                    }
-              }
-            >
-              {a}
-            </motion.button>
-          ))}
+        {/* Area filter pills + Compare toggle */}
+        <div className="mb-6 flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 flex-1">
+            {AREAS.map((a) => (
+              <motion.button
+                key={a}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setArea(a)}
+                className="flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition"
+                style={
+                  area === a
+                    ? {
+                        background: "linear-gradient(135deg, #dc2626, #f87171)",
+                        color: "white",
+                        boxShadow: "0 4px 16px rgba(220,38,38,0.3)",
+                      }
+                    : {
+                        background: "rgba(255,255,255,0.8)",
+                        color: "#64748b",
+                        border: "1px solid #fee2e2",
+                      }
+                }
+              >
+                {a}
+              </motion.button>
+            ))}
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              setCompareMode((v) => !v);
+              setCompareList([]);
+              setShowComparePanel(false);
+              setSelected(null);
+            }}
+            className="flex-shrink-0 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-all"
+            style={
+              compareMode
+                ? {
+                    background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
+                    color: "white",
+                    boxShadow: "0 4px 16px rgba(124,58,237,0.3)",
+                  }
+                : {
+                    background: "rgba(255,255,255,0.8)",
+                    color: "#7c3aed",
+                    border: "1px solid #ede9fe",
+                  }
+            }
+          >
+            ⚡ Comparar
+          </motion.button>
         </div>
 
         {/* Main layout */}
         <div
-          className={`grid gap-6 ${selected ? "lg:grid-cols-[1fr_420px]" : "grid-cols-1"}`}
+          className={`grid gap-6 ${selected && !compareMode && !showComparePanel ? "lg:grid-cols-[1fr_420px]" : "grid-cols-1"}`}
         >
           {/* Career grid */}
           <div>
@@ -724,34 +944,44 @@ export default function CarrerasPage() {
                 className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
               >
                 <AnimatePresence>
-                  {filtered.map((career) => (
-                    <motion.div
-                      key={career.id}
-                      layout
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <CareerCard
-                        career={career}
-                        selected={selected?.id === career.id}
-                        onClick={() =>
-                          handleCareerSelect(
-                            selected?.id === career.id ? null : career,
-                          )
-                        }
-                      />
-                    </motion.div>
-                  ))}
+                  {filtered.map((career) => {
+                    const compareIdx = compareList.findIndex((c) => c.id === career.id);
+                    return (
+                      <motion.div
+                        key={career.id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <CareerCard
+                          career={career}
+                          selected={selected?.id === career.id}
+                          compareSelected={compareIdx !== -1}
+                          compareMode={compareMode}
+                          compareIndex={compareIdx !== -1 ? compareIdx : undefined}
+                          onClick={() => {
+                            if (compareMode) {
+                              handleCompareToggle(career);
+                            } else {
+                              handleCareerSelect(
+                                selected?.id === career.id ? null : career,
+                              );
+                            }
+                          }}
+                        />
+                      </motion.div>
+                    );
+                  })}
                 </AnimatePresence>
               </motion.div>
             )}
           </div>
 
-          {/* Simulator panel */}
+          {/* Simulator panel (single select) */}
           <AnimatePresence>
-            {selected && (
+            {selected && !compareMode && !showComparePanel && (
               <div className="lg:sticky lg:top-20 lg:self-start">
                 <SimulatorPanel
                   career={selected}
@@ -762,9 +992,110 @@ export default function CarrerasPage() {
           </AnimatePresence>
         </div>
 
+        {/* Compare panel — full width modal */}
+        <AnimatePresence>
+          {showComparePanel && compareList.length >= 2 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/40 backdrop-blur-sm py-10 px-4"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setShowComparePanel(false);
+                  setCompareList([]);
+                  setCompareMode(false);
+                }
+              }}
+            >
+              <div className="w-full max-w-5xl">
+                <ComparePanel
+                  careers={compareList}
+                  onClose={() => {
+                    setShowComparePanel(false);
+                    setCompareList([]);
+                    setCompareMode(false);
+                  }}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Floating compare bar */}
+        <AnimatePresence>
+          {compareMode && compareList.length > 0 && !showComparePanel && (
+            <motion.div
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white px-5 py-3 shadow-2xl"
+              style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  {compareList.map((c) => (
+                    <motion.div
+                      key={c.id}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl text-lg"
+                      style={{ background: c.color + "15", border: `1px solid ${c.color}30` }}
+                    >
+                      {c.emoji}
+                    </motion.div>
+                  ))}
+                  {Array.from({ length: 3 - compareList.length }).map((_, i) => (
+                    <div
+                      key={`empty-${i}`}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl border-2 border-dashed border-slate-200 text-slate-300"
+                    >
+                      +
+                    </div>
+                  ))}
+                </div>
+
+                <div className="h-8 w-px bg-slate-200" />
+
+                <p className="text-sm font-semibold text-slate-600 whitespace-nowrap">
+                  {compareList.length}/3 seleccionadas
+                </p>
+
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  disabled={compareList.length < 2}
+                  onClick={() => setShowComparePanel(true)}
+                  className="rounded-xl px-5 py-2.5 text-sm font-bold text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{
+                    background: compareList.length >= 2
+                      ? "linear-gradient(135deg, #7c3aed, #a78bfa)"
+                      : "#94a3b8",
+                    boxShadow: compareList.length >= 2 ? "0 4px 16px rgba(124,58,237,0.3)" : "none",
+                  }}
+                >
+                  Comparar ⚡
+                </motion.button>
+
+                <button
+                  onClick={() => {
+                    setCompareList([]);
+                    setCompareMode(false);
+                  }}
+                  className="text-slate-400 hover:text-slate-600 transition text-sm"
+                >
+                  Limpiar
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* No career selected CTA */}
         <AnimatePresence>
-          {!selected && (
+          {!selected && !compareMode && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -773,6 +1104,18 @@ export default function CarrerasPage() {
             >
               <p className="text-sm">
                 👆 Haz clic en cualquier carrera para activar el simulador
+              </p>
+            </motion.div>
+          )}
+          {compareMode && compareList.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mt-8 text-center text-slate-400"
+            >
+              <p className="text-sm">
+                ⚡ Selecciona entre 2 y 3 carreras para compararlas lado a lado
               </p>
             </motion.div>
           )}

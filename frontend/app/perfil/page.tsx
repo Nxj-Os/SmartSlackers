@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/src/firebase/config";
-import { doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc, updateDoc, Timestamp, getDocs, query, collection, orderBy, limit } from "firebase/firestore";
 import { db } from "@/src/firebase/config";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -68,6 +68,18 @@ type CarreraAnalizada = {
   razon: string;
 };
 
+type TestHistoryEntry = {
+  id: string;
+  careerKey: string;
+  careerTitle: string | null;
+  careerEmoji: string | null;
+  match: number | null;
+  score: number;
+  insufficient: boolean;
+  answered: number;
+  completedAt: Timestamp | null;
+};
+
 // ─── Admisión steps ──────────────────────────────────────────────────────────
 
 const ETAPAS_ADMISION = [
@@ -104,6 +116,60 @@ export default function PerfilPage() {
   const [analizando,        setAnalizando]         = useState(false);
   const [carrerasAnalizadas, setCarrerasAnalizadas] = useState<CarreraAnalizada[] | null>(null);
   const [errorAnalisis,     setErrorAnalisis]      = useState<string | null>(null);
+
+  // Test history
+  const [testHistory, setTestHistory]         = useState<TestHistoryEntry[]>([]);
+  const [historyLoading, setHistoryLoading]   = useState(true);
+  const [inProgressTest, setInProgressTest]   = useState<{
+    current: number; answeredCount: number; savedAt: number;
+  } | null>(null);
+
+  // Top-2 carreras por promedio de match (tests completados únicamente)
+  const careerStats = useMemo(() => {
+    const completed = testHistory.filter(
+      (e) => !e.insufficient && e.careerKey && e.match !== null,
+    );
+    if (completed.length === 0) return null;
+
+    const grouped: Record<string, { matches: number[]; title: string; emoji: string }> = {};
+    completed.forEach((e) => {
+      if (!grouped[e.careerKey]) {
+        grouped[e.careerKey] = {
+          matches: [],
+          title: e.careerTitle ?? e.careerKey,
+          emoji: e.careerEmoji ?? "🎓",
+        };
+      }
+      grouped[e.careerKey].matches.push(e.match!);
+    });
+
+    return Object.entries(grouped)
+      .map(([key, data]) => ({
+        key,
+        title: data.title,
+        emoji: data.emoji,
+        avgMatch: Math.round(data.matches.reduce((a, b) => a + b, 0) / data.matches.length),
+        count: data.matches.length,
+      }))
+      .sort((a, b) => b.count !== a.count ? b.count - a.count : b.avgMatch - a.avgMatch)
+      .slice(0, 2);
+  }, [testHistory]);
+
+  // Lee el test en progreso desde localStorage (client-only)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("vocatio_test_session");
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (Array.isArray(data.answers) && data.answers.length > 0 && data.current < 10) {
+        setInProgressTest({
+          current:       data.current,
+          answeredCount: data.answers.filter((a: string) => a !== "none").length,
+          savedAt:       data.savedAt ?? Date.now(),
+        });
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   // Badges
   const [badges, setBadges]                   = useState<UserBadge[]>([]);
@@ -163,6 +229,44 @@ export default function PerfilPage() {
         // badges are optional, fail silently
       } finally {
         setBadgesLoading(false);
+      }
+
+      // Carga historial de tests
+      try {
+        let histSnap;
+        try {
+          histSnap = await getDocs(
+            query(
+              collection(db, foundCol, currentUser.uid, "historialTests"),
+              orderBy("completedAt", "desc"),
+              limit(10),
+            ),
+          );
+        } catch {
+          histSnap = await getDocs(
+            query(collection(db, foundCol, currentUser.uid, "historialTests"), limit(10)),
+          );
+        }
+        const history: TestHistoryEntry[] = histSnap.docs.map((d) => {
+          const data = d.data();
+          return {
+            id:           d.id,
+            careerKey:    data.careerKey    ?? "",
+            careerTitle:  data.careerTitle  ?? null,
+            careerEmoji:  data.careerEmoji  ?? null,
+            match:        data.match        ?? null,
+            score:        data.score        ?? 0,
+            insufficient: data.insufficient ?? false,
+            answered:     data.answered     ?? 0,
+            completedAt:  data.completedAt  ?? null,
+          };
+        });
+        history.sort((a, b) => (b.completedAt?.seconds ?? 0) - (a.completedAt?.seconds ?? 0));
+        setTestHistory(history);
+      } catch {
+        // historial es opcional
+      } finally {
+        setHistoryLoading(false);
       }
 
       setLoading(false);
@@ -738,6 +842,110 @@ export default function PerfilPage() {
                 Tu cuenta está registrada y has iniciado sesión correctamente.
               </p>
             </div>
+
+            {/* ── Círculo de estadísticas vocacionales ── */}
+            {!historyLoading && careerStats && careerStats.length > 0 && (() => {
+              const R = 58;
+              const CIRC = 2 * Math.PI * R;
+              const top = careerStats[0];
+              const second = careerStats[1] ?? null;
+              return (
+                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
+                  <p className="mb-5 text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
+                    Tu perfil vocacional
+                  </p>
+
+                  {/* Círculo principal */}
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="relative">
+                      <svg width="148" height="148" viewBox="0 0 148 148">
+                        <defs>
+                          <linearGradient id="cvGrad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor="#dc2626" />
+                            <stop offset="100%" stopColor="#f87171" />
+                          </linearGradient>
+                        </defs>
+                        {/* Track */}
+                        <circle cx="74" cy="74" r={R} fill="none" stroke="#f1f5f9" strokeWidth="13" />
+                        {/* Progreso */}
+                        <motion.circle
+                          cx="74" cy="74" r={R}
+                          fill="none"
+                          stroke="url(#cvGrad)"
+                          strokeWidth="13"
+                          strokeLinecap="round"
+                          strokeDasharray={CIRC}
+                          initial={{ strokeDashoffset: CIRC }}
+                          animate={{ strokeDashoffset: CIRC * (1 - top.avgMatch / 100) }}
+                          transition={{ duration: 1.4, ease: "easeOut", delay: 0.15 }}
+                          transform="rotate(-90 74 74)"
+                        />
+                      </svg>
+                      {/* Texto central */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-3xl leading-none">{top.emoji}</span>
+                        <span className="mt-1 text-2xl font-black text-red-600">{top.avgMatch}%</span>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-bold text-slate-900">{top.title}</p>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Basado en {top.count} test{top.count !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Segunda opción — levemente borrosa */}
+                  {second && (
+                    <div className="mt-5 border-t border-slate-100 pt-4">
+                      <p className="mb-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Segunda opción
+                      </p>
+                      <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-3">
+                        <div
+                          className="flex items-center gap-3"
+                          style={{ filter: "blur(3.5px)", userSelect: "none", pointerEvents: "none" }}
+                        >
+                          {/* Mini círculo */}
+                          <div className="relative flex-shrink-0">
+                            <svg width="56" height="56" viewBox="0 0 56 56">
+                              <circle cx="28" cy="28" r="20" fill="none" stroke="#e2e8f0" strokeWidth="6" />
+                              <circle
+                                cx="28" cy="28" r="20"
+                                fill="none"
+                                stroke="#dc2626"
+                                strokeWidth="6"
+                                strokeLinecap="round"
+                                strokeDasharray={2 * Math.PI * 20}
+                                strokeDashoffset={2 * Math.PI * 20 * (1 - second.avgMatch / 100)}
+                                transform="rotate(-90 28 28)"
+                                opacity="0.65"
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-xs font-black text-red-600">{second.avgMatch}%</span>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-900">
+                              {second.emoji} {second.title}
+                            </p>
+                            <p className="text-xs text-slate-500">Segunda carrera más apta</p>
+                          </div>
+                        </div>
+                        {/* Overlay con indicación */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 shadow-sm">
+                            <span className="text-xs">🔍</span>
+                            <span className="text-xs font-semibold text-slate-600">Haz más tests para revelar</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             <div className="space-y-3 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-600">
