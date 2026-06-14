@@ -25,7 +25,7 @@ export const CAREER_COSMETICS: Record<string, CareerCosmetic> = {
   },
   ingenieria: {
     career: "ingenieria",
-    label: "Ingeniería",
+    label: "Ingeniería de Sistemas",
     accessory: "wrench",
     accessoryColor: "#3B6D11",
     hat: "hard-hat",

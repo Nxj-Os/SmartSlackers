@@ -18,7 +18,7 @@ export default function QuestionCard({
   question, current, total, timeLeft, selected, score, onAnswer
 }: Props) {
   return (
-    <div style={{ width: "100%", maxWidth: "680px" }}>
+    <div style={{ width: "100%", maxWidth: question.options.length > 4 ? "900px" : "680px" }}>
 
       <ProgressBar
         current={current}
@@ -67,11 +67,11 @@ export default function QuestionCard({
         </motion.div>
       </AnimatePresence>
 
-      {/* Grid de opciones */}
+      {/* Grid de opciones — 2 col en mobile, 3 col en tablet+ */}
       <div style={{
         display:             "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap:                 "12px",
+        gridTemplateColumns: question.options.length > 4 ? "repeat(3, 1fr)" : "1fr 1fr",
+        gap:                 "10px",
         marginBottom:        "10px",
       }}>
         {question.options.map((opt, i) => (
