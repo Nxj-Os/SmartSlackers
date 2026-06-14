@@ -7,8 +7,8 @@ import Navbar from "@/components/Navbar";
 import { useTranslation } from "@/lib/i18n";
 
 type Lab = {
-  name: string;
-  desc: string;
+  nameKey: string;
+  descKey: string;
   img: string;
 };
 
@@ -17,122 +17,122 @@ const BASE = "https://www.utp.edu.pe";
 const LABS_BY_CAREER: Record<string, Lab[]> = {
   medicina: [
     {
-      name: "Hospital Simulado",
-      desc: "Entorno innovador que combina teoría y práctica con simuladores avanzados de última generación.",
+      nameKey: "labs.medicina.hospitalSimulado.name",
+      descKey: "labs.medicina.hospitalSimulado.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/HOSPITAL%20SIMULADO_1%202.jpg`,
     },
     {
-      name: "Lab. Organización y Función del Cuerpo Humano",
-      desc: "Espacio innovador con tecnología avanzada y disección virtual en 3D.",
+      nameKey: "labs.medicina.labOrganizacion.name",
+      descKey: "labs.medicina.labOrganizacion.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/LAB%20DE%20ORGANIZACI%C3%93N%20Y%20FUNCI%C3%93N%20DEL%20CUERPO%20HUMANO_1%202.jpg`,
     },
     {
-      name: "Sala de Simulación Compleja Ginecobstetra",
-      desc: "Espacio para practicar ginecología, obstetricia y neonatología con simuladores reales.",
+      nameKey: "labs.medicina.salaSimulacion.name",
+      descKey: "labs.medicina.salaSimulacion.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/Sala%20de%20Simulaci%C3%B3n%20Compleja%20-%20%20Obestricia%201.jpg`,
     },
     {
-      name: "Sala de Disección AR y VR",
-      desc: "Centro de innovación con tecnología de realidad aumentada y virtual para disección sin cadáveres.",
+      nameKey: "labs.medicina.salaDiseccion.name",
+      descKey: "labs.medicina.salaDiseccion.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/Saladedisecci%C3%B3nARyVR.webp`,
     },
   ],
   arquitectura: [
     {
-      name: "Taller de Arquitectura",
-      desc: "Ambiente especializado equipado para el diseño y realización de maquetas basadas en proyectos de clase.",
+      nameKey: "labs.arquitectura.tallerArquitectura.name",
+      descKey: "labs.arquitectura.tallerArquitectura.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/TALLER%20DE%20ARQUITECTURA.jpg`,
     },
     {
-      name: "Sala BIM",
-      desc: "Espacio con tecnología avanzada y modelos 3D para proyectos de construcción y diseño arquitectónico.",
+      nameKey: "labs.arquitectura.salaBIM.name",
+      descKey: "labs.arquitectura.salaBIM.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/SALA%20BIM%201.jpg`,
     },
   ],
   derecho: [
     {
-      name: "Sala de Audiencias",
-      desc: "Espacio para actividades prácticas donde los estudiantes simulan audiencias procesales reales.",
+      nameKey: "labs.derecho.salaAudiencias.name",
+      descKey: "labs.derecho.salaAudiencias.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/SALADEAUDIENCIA%201.webp`,
     },
     {
-      name: "Sala Design Thinking",
-      desc: "Espacio colaborativo para desarrollar soluciones innovadoras a problemas legales complejos.",
+      nameKey: "labs.derecho.salaDesignThinking.name",
+      descKey: "labs.derecho.salaDesignThinking.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/SALA%20DESIGN%20THINKING%203.jpg`,
     },
   ],
   gastronomia: [
     {
-      name: "Laboratorio de Técnicas Dietéticas",
-      desc: "Centro de innovación en seguridad alimentaria con tecnología avanzada para nutrición y dietética.",
+      nameKey: "labs.gastronomia.labTecnicasDieteticas.name",
+      descKey: "labs.gastronomia.labTecnicasDieteticas.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/Laboratorio%20de%20Nutrici%C3%B3n%20y%20Diet%C3%A9tica%201.jpg`,
     },
     {
-      name: "Laboratorio de Procesos Industriales",
-      desc: "Entorno educativo con cuatro plantas de producción: cerveza artesanal, néctares, snacks y más.",
+      nameKey: "labs.gastronomia.labProcesosIndustriales.name",
+      descKey: "labs.gastronomia.labProcesosIndustriales.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/LAB%20DE%20PROCESOS%20INDUSTRIALES%203.jpg`,
     },
   ],
   "ingenieria-civil": [
     {
-      name: "Lab. Tecnología del Concreto y Mecánica de Suelos",
-      desc: "Realizarás pruebas normalizadas en concreto, suelos y asfalto con equipos de última generación.",
+      nameKey: "labs.ingenieriaCivil.labConcretoSuelos.name",
+      descKey: "labs.ingenieriaCivil.labConcretoSuelos.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/Laboratorio%20de%20tecnolog%C3%ADa%20de%20concreto%20y%20resistencia%201.jpg`,
     },
     {
-      name: "Laboratorio Hidráulica",
-      desc: "Laboratorio para estudiar el comportamiento del agua en canales, tuberías y estructuras hidráulicas.",
+      nameKey: "labs.ingenieriaCivil.labHidraulica.name",
+      descKey: "labs.ingenieriaCivil.labHidraulica.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/LAB.%20HIDR%C3%81ULICA%201.jpg`,
     },
     {
-      name: "Sala BIM",
-      desc: "Modelado de información de construcción con tecnología 3D para proyectos de ingeniería civil.",
+      nameKey: "labs.ingenieriaCivil.salaBIM.name",
+      descKey: "labs.ingenieriaCivil.salaBIM.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/SALA%20BIM%201.jpg`,
     },
   ],
   software: [
     {
-      name: "Sala con Macs",
-      desc: "Ambientes especializados con equipos Apple para desarrollo de software, diseño y multimedia.",
+      nameKey: "labs.software.salaMacs.name",
+      descKey: "labs.software.salaMacs.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/LABORATORIO%20DE%20COMPUTADORAS%20MAC%201.jpg`,
     },
     {
-      name: "Sala Design Thinking",
-      desc: "Espacio colaborativo para el pensamiento de diseño e innovación tecnológica.",
+      nameKey: "labs.software.salaDesignThinking.name",
+      descKey: "labs.software.salaDesignThinking.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/SALA%20DESIGN%20THINKING%203.jpg`,
     },
     {
-      name: "Laboratorio de Mecatrónica",
-      desc: "Laboratorio multidisciplinario para el diseño y desarrollo de sistemas robóticos inteligentes.",
+      nameKey: "labs.software.labMecatronica.name",
+      descKey: "labs.software.labMecatronica.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/LAB.%20DE%20MECATR%C3%93NICA%201.jpg`,
     },
   ],
   psicologia: [
     {
-      name: "Cámara Gesell",
-      desc: "Sala diseñada para entrevistas psicológicas, evaluaciones clínicas e intervenciones terapéuticas.",
+      nameKey: "labs.psicologia.camaraGesell.name",
+      descKey: "labs.psicologia.camaraGesell.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/SALA%20GESSEL%201.jpg`,
     },
     {
-      name: "Sala Design Thinking",
-      desc: "Espacio colaborativo para desarrollar soluciones innovadoras en salud mental y bienestar.",
+      nameKey: "labs.psicologia.salaDesignThinking.name",
+      descKey: "labs.psicologia.salaDesignThinking.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/SALA%20DESIGN%20THINKING%203.jpg`,
     },
   ],
   marketing: [
     {
-      name: "Taller de Producción Audiovisual",
-      desc: "Espacio profesional equipado con ciclorama, chroma key, switcher y cámaras de cine.",
+      nameKey: "labs.marketing.tallerAudiovisual.name",
+      descKey: "labs.marketing.tallerAudiovisual.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/ESTUDIO%20DE%20TV%201.jpg`,
     },
     {
-      name: "Cabina de Producción de Audio",
-      desc: "Espacio diseñado específicamente para grabar y mezclar sonido de alta calidad profesional.",
+      nameKey: "labs.marketing.cabinaAudio.name",
+      descKey: "labs.marketing.cabinaAudio.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/Cabina%20de%20producci%C3%B3n%20de%20audio.jpg`,
     },
     {
-      name: "Sala con Macs",
-      desc: "Ambientes especializados con equipos Apple para diseño gráfico, edición y marketing digital.",
+      nameKey: "labs.marketing.salaMacs.name",
+      descKey: "labs.marketing.salaMacs.desc",
       img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/LABORATORIO%20DE%20COMPUTADORAS%20MAC%201.jpg`,
     },
   ],
@@ -140,43 +140,43 @@ const LABS_BY_CAREER: Record<string, Lab[]> = {
 
 const ALL_LABS: Lab[] = [
   {
-    name: "Hospital Simulado",
-    desc: "Entorno innovador con simuladores avanzados para medicina y ciencias de la salud.",
+    nameKey: "labs.all.hospitalSimulado.name",
+    descKey: "labs.all.hospitalSimulado.desc",
     img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/HOSPITAL%20SIMULADO_1%202.jpg`,
   },
   {
-    name: "Sala de Audiencias",
-    desc: "Simulación de audiencias procesales reales para estudiantes de derecho.",
+    nameKey: "labs.all.salaAudiencias.name",
+    descKey: "labs.all.salaAudiencias.desc",
     img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/SALADEAUDIENCIA%201.webp`,
   },
   {
-    name: "Taller de Arquitectura",
-    desc: "Diseño y maquetas para proyectos arquitectónicos.",
+    nameKey: "labs.all.tallerArquitectura.name",
+    descKey: "labs.all.tallerArquitectura.desc",
     img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/TALLER%20DE%20ARQUITECTURA.jpg`,
   },
   {
-    name: "Sala Design Thinking",
-    desc: "Espacio colaborativo para innovación y pensamiento creativo.",
+    nameKey: "labs.all.salaDesignThinking.name",
+    descKey: "labs.all.salaDesignThinking.desc",
     img: `${BASE}/descubre-utp/sites/consideracion/files/noticias/SALA%20DESIGN%20THINKING%203.jpg`,
   },
   {
-    name: "Sala BIM",
-    desc: "Modelado 3D de proyectos de construcción y arquitectura.",
+    nameKey: "labs.all.salaBIM.name",
+    descKey: "labs.all.salaBIM.desc",
     img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/SALA%20BIM%201.jpg`,
   },
   {
-    name: "Laboratorio de Mecatrónica",
-    desc: "Robótica y sistemas mecatrónicos de última generación.",
+    nameKey: "labs.all.labMecatronica.name",
+    descKey: "labs.all.labMecatronica.desc",
     img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/LAB.%20DE%20MECATR%C3%93NICA%201.jpg`,
   },
   {
-    name: "Cámara Gesell",
-    desc: "Evaluaciones psicológicas e intervenciones terapéuticas.",
+    nameKey: "labs.all.camaraGesell.name",
+    descKey: "labs.all.camaraGesell.desc",
     img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/SALA%20GESSEL%201.jpg`,
   },
   {
-    name: "Taller de Producción Audiovisual",
-    desc: "Producción de video profesional con ciclorama y chroma key.",
+    nameKey: "labs.all.tallerAudiovisual.name",
+    descKey: "labs.all.tallerAudiovisual.desc",
     img: `${BASE}/descubre-utp/sites/consideracion/files/imagenes/ESTUDIO%20DE%20TV%201.jpg`,
   },
 ];
@@ -278,10 +278,10 @@ function LabGallery() {
                   UTP
                 </div>
                 <h3 className="mt-1 text-base font-bold text-slate-900 leading-snug">
-                  {lab.name}
+                  {t(lab.nameKey)}
                 </h3>
                 <p className="mt-2 text-sm text-slate-500 leading-relaxed">
-                  {lab.desc}
+                  {t(lab.descKey)}
                 </p>
               </div>
             </motion.div>

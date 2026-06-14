@@ -415,7 +415,152 @@
   },
   "laboratorios": {
     "laboratorios": "Rurashunakuna",
-    "conocerInstalaciones": "UTP rurashunakuna qhawasqay."
+    "conocerInstalaciones": "UTP rurashunakuna qhawasqay.",
+    "infraestructuraUtp": "UTP Rurashunakuna",
+    "conoceNuestrosLaboratorios": "Nukanchik rurashunakuna qhawasqay",
+    "instalacionesClaseMundial": "Mundu allin wasikuna qanpa kamayuq yachaynapaq",
+    "unLaboratorioDisponible": "{{count}} rurashun kanan",
+    "laboratoriosDisponibles": "{{count}} rurashunakuna kanan",
+    "volverAlTest": "Kutichiy sayk'uman",
+    "explorarCarreras": "Carrerakuna qhawasqay",
+    "infoOficial": "Yachay allin: ",
+    "cargandoLaboratorios": "Rurashunakuna musyachkani..."
+  },
+  "labs": {
+    "medicina": {
+      "hospitalSimulado": {
+        "name": "Musyay Hospital",
+        "desc": "Yachaywan pukllaywan chiqap churikunawan huk allin t'ipiy."
+      },
+      "labOrganizacion": {
+        "name": "Lab. Runakay Kawsaywan Chaymanta",
+        "desc": "Yachachiy 3D-pim huk allin t'ipiy."
+      },
+      "salaSimulacion": {
+        "name": "Warmi Kawsay Simulacion Sala",
+        "desc": "Warmi kawsay, warmi churakuy chaymanta warawasqan simulan chaymanta t'ipiy."
+      },
+      "salaDiseccion": {
+        "name": "AR VR Diseccion Sala",
+        "desc": "Yachachiy AR VR chaymanta huk allin t'ipiy mana runakay chinkachinapaq."
+      }
+    },
+    "arquitectura": {
+      "tallerArquitectura": {
+        "name": "Arquitectura Taller",
+        "desc": "Clase proyektukunapaq maquetakuna churapay allin t'ipiy."
+      },
+      "salaBIM": {
+        "name": "BIM Sala",
+        "desc": "3D modelokunawan wasi churakuy chaymanta t'ipiy."
+      }
+    },
+    "derecho": {
+      "salaAudiencias": {
+        "name": "Audiencia Sala",
+        "desc": "Tayta runakuna huk allin audiencia simulan chaymanta t'ipiy."
+      },
+      "salaDesignThinking": {
+        "name": "Design Thinking Sala",
+        "desc": "Derecho ukchakunapaq musuq yuyaykunata churapay t'ipiy."
+      }
+    },
+    "gastronomia": {
+      "labTecnicasDieteticas": {
+        "name": "Dietetica Teknika Lab",
+        "desc": "Mikhuña allin chaymanta yachay chaymanta t'ipiy."
+      },
+      "labProcesosIndustriales": {
+        "name": "Industrial Proceso Lab",
+        "desc": "4 planta chaymanta chicha, mikhuna churapay t'ipiy."
+      }
+    },
+    "ingenieriaCivil": {
+      "labConcretoSuelos": {
+        "name": "Concreto Suelo Lab",
+        "desc": "Concreto, allpata allin chakichiy chaymanta t'ipiy."
+      },
+      "labHidraulica": {
+        "name": "Hidraulica Lab",
+        "desc": "Yaku maymantap purin chaymanta t'ipiy."
+      },
+      "salaBIM": {
+        "name": "BIM Sala",
+        "desc": "3D chaymanta wasi churakuy t'ipiy."
+      }
+    },
+    "software": {
+      "salaMacs": {
+        "name": "Mac Sala",
+        "desc": "Apple equipo chaymanta software churakuy t'ipiy."
+      },
+      "salaDesignThinking": {
+        "name": "Design Thinking Sala",
+        "desc": "Musuq yuyay churakuy t'ipiy."
+      },
+      "labMecatronica": {
+        "name": "Mecatronica Lab",
+        "desc": "Robot churakuy t'ipiy."
+      }
+    },
+    "psicologia": {
+      "camaraGesell": {
+        "name": "Gesell Camara",
+        "desc": "Rimay, qhawasqay, yanapaway chaymanta t'ipiy."
+      },
+      "salaDesignThinking": {
+        "name": "Design Thinking Sala",
+        "desc": "Kawsay allin chaymanta musuq yuyay churakuy t'ipiy."
+      }
+    },
+    "marketing": {
+      "tallerAudiovisual": {
+        "name": "Audiovisual Taller",
+        "desc": "Cine kamera, chroma key chaymanta t'ipiy."
+      },
+      "cabinaAudio": {
+        "name": "Audio Cabina",
+        "desc": "Rimay allin musyachiy t'ipiy."
+      },
+      "salaMacs": {
+        "name": "Mac Sala",
+        "desc": "Apple equipo chaymanta diseño marketing chaymanta t'ipiy."
+      }
+    },
+    "all": {
+      "hospitalSimulado": {
+        "name": "Musyay Hospital",
+        "desc": "Salud yachaynapaq chiqap churikunawan t'ipiy."
+      },
+      "salaAudiencias": {
+        "name": "Audiencia Sala",
+        "desc": "Derecho taytakunapaq allin audiencia t'ipiy."
+      },
+      "tallerArquitectura": {
+        "name": "Arquitectura Taller",
+        "desc": "Wasi churakuy maquetakuna."
+      },
+      "salaDesignThinking": {
+        "name": "Design Thinking Sala",
+        "desc": "Musuq yuyay churakuy t'ipiy."
+      },
+      "salaBIM": {
+        "name": "BIM Sala",
+        "desc": "3D wasi churakuy."
+      },
+      "labMecatronica": {
+        "name": "Mecatronica Lab",
+        "desc": "Robot churakuy t'ipiy."
+      },
+      "camaraGesell": {
+        "name": "Gesell Camara",
+        "desc": "Psicologia qhawasqay yanapaway."
+      },
+      "tallerAudiovisual": {
+        "name": "Audiovisual Taller",
+        "desc": "Video churakuy chroma key chaymanta."
+      }
+    }
   },
   "common": {
     "cargando": "Musyachkani...",

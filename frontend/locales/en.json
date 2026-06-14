@@ -415,7 +415,152 @@
   },
   "laboratorios": {
     "laboratorios": "Labs",
-    "conocerInstalaciones": "Discover UTP's facilities and laboratories."
+    "conocerInstalaciones": "Discover UTP's facilities and laboratories.",
+    "infraestructuraUtp": "UTP Infrastructure",
+    "conoceNuestrosLaboratorios": "Discover our labs",
+    "instalacionesClaseMundial": "World-class facilities for your professional training",
+    "unLaboratorioDisponible": "{{count}} lab available",
+    "laboratoriosDisponibles": "{{count}} labs available",
+    "volverAlTest": "Back to test",
+    "explorarCarreras": "Explore careers",
+    "infoOficial": "Official info: ",
+    "cargandoLaboratorios": "Loading labs..."
+  },
+  "labs": {
+    "medicina": {
+      "hospitalSimulado": {
+        "name": "Simulated Hospital",
+        "desc": "Innovative environment combining theory and practice with advanced last-generation simulators."
+      },
+      "labOrganizacion": {
+        "name": "Lab. Human Body Organization and Function",
+        "desc": "Innovative space with advanced technology and 3D virtual dissection."
+      },
+      "salaSimulacion": {
+        "name": "Complex Gynecobstetric Simulation Room",
+        "desc": "Space to practice gynecology, obstetrics and neonatology with real simulators."
+      },
+      "salaDiseccion": {
+        "name": "AR and VR Dissection Room",
+        "desc": "Innovation center with augmented and virtual reality technology for dissection without cadavers."
+      }
+    },
+    "arquitectura": {
+      "tallerArquitectura": {
+        "name": "Architecture Workshop",
+        "desc": "Specialized environment equipped for design and model-making based on class projects."
+      },
+      "salaBIM": {
+        "name": "BIM Room",
+        "desc": "Space with advanced technology and 3D models for construction and architectural design projects."
+      }
+    },
+    "derecho": {
+      "salaAudiencias": {
+        "name": "Courtroom",
+        "desc": "Space for practical activities where students simulate real court proceedings."
+      },
+      "salaDesignThinking": {
+        "name": "Design Thinking Room",
+        "desc": "Collaborative space to develop innovative solutions to complex legal problems."
+      }
+    },
+    "gastronomia": {
+      "labTecnicasDieteticas": {
+        "name": "Dietetic Techniques Laboratory",
+        "desc": "Food safety innovation center with advanced technology for nutrition and dietetics."
+      },
+      "labProcesosIndustriales": {
+        "name": "Industrial Processes Laboratory",
+        "desc": "Educational environment with four production plants: craft beer, nectars, snacks and more."
+      }
+    },
+    "ingenieriaCivil": {
+      "labConcretoSuelos": {
+        "name": "Concrete Technology and Soil Mechanics Lab",
+        "desc": "Perform standardized tests on concrete, soil and asphalt with state-of-the-art equipment."
+      },
+      "labHidraulica": {
+        "name": "Hydraulics Laboratory",
+        "desc": "Laboratory to study water behavior in channels, pipes and hydraulic structures."
+      },
+      "salaBIM": {
+        "name": "BIM Room",
+        "desc": "Construction information modeling with 3D technology for civil engineering projects."
+      }
+    },
+    "software": {
+      "salaMacs": {
+        "name": "Mac Room",
+        "desc": "Specialized environments with Apple equipment for software development, design and multimedia."
+      },
+      "salaDesignThinking": {
+        "name": "Design Thinking Room",
+        "desc": "Collaborative space for design thinking and technological innovation."
+      },
+      "labMecatronica": {
+        "name": "Mechatronics Laboratory",
+        "desc": "Multidisciplinary laboratory for the design and development of intelligent robotic systems."
+      }
+    },
+    "psicologia": {
+      "camaraGesell": {
+        "name": "Gesell Chamber",
+        "desc": "Room designed for psychological interviews, clinical evaluations and therapeutic interventions."
+      },
+      "salaDesignThinking": {
+        "name": "Design Thinking Room",
+        "desc": "Collaborative space to develop innovative solutions in mental health and wellbeing."
+      }
+    },
+    "marketing": {
+      "tallerAudiovisual": {
+        "name": "Audiovisual Production Workshop",
+        "desc": "Professional space equipped with cyclorama, chroma key, switcher and cinema cameras."
+      },
+      "cabinaAudio": {
+        "name": "Audio Production Booth",
+        "desc": "Space specifically designed for recording and mixing high-quality professional sound."
+      },
+      "salaMacs": {
+        "name": "Mac Room",
+        "desc": "Specialized environments with Apple equipment for graphic design, editing and digital marketing."
+      }
+    },
+    "all": {
+      "hospitalSimulado": {
+        "name": "Simulated Hospital",
+        "desc": "Innovative environment with advanced simulators for medicine and health sciences."
+      },
+      "salaAudiencias": {
+        "name": "Courtroom",
+        "desc": "Simulation of real court proceedings for law students."
+      },
+      "tallerArquitectura": {
+        "name": "Architecture Workshop",
+        "desc": "Design and models for architectural projects."
+      },
+      "salaDesignThinking": {
+        "name": "Design Thinking Room",
+        "desc": "Collaborative space for innovation and creative thinking."
+      },
+      "salaBIM": {
+        "name": "BIM Room",
+        "desc": "3D modeling of construction and architecture projects."
+      },
+      "labMecatronica": {
+        "name": "Mechatronics Laboratory",
+        "desc": "Robotics and state-of-the-art mechatronic systems."
+      },
+      "camaraGesell": {
+        "name": "Gesell Chamber",
+        "desc": "Psychological evaluations and therapeutic interventions."
+      },
+      "tallerAudiovisual": {
+        "name": "Audiovisual Production Workshop",
+        "desc": "Professional video production with cyclorama and chroma key."
+      }
+    }
   },
   "common": {
     "cargando": "Loading...",

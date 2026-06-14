@@ -436,7 +436,152 @@
   },
   "laboratorios": {
     "laboratorios": "Laboratorios",
-    "conocerInstalaciones": "Conoce las instalaciones y laboratorios de la UTP."
+    "conocerInstalaciones": "Conoce las instalaciones y laboratorios de la UTP.",
+    "infraestructuraUtp": "Infraestructura UTP",
+    "conoceNuestrosLaboratorios": "Conoce nuestros laboratorios",
+    "instalacionesClaseMundial": "Instalaciones de clase mundial para tu formación profesional",
+    "unLaboratorioDisponible": "{{count}} laboratorio disponible",
+    "laboratoriosDisponibles": "{{count}} laboratorios disponibles",
+    "volverAlTest": "Volver al test",
+    "explorarCarreras": "Explorar carreras",
+    "infoOficial": "Información oficial: ",
+    "cargandoLaboratorios": "Cargando laboratorios..."
+  },
+  "labs": {
+    "medicina": {
+      "hospitalSimulado": {
+        "name": "Hospital Simulado",
+        "desc": "Entorno innovador que combina teoría y práctica con simuladores avanzados de última generación."
+      },
+      "labOrganizacion": {
+        "name": "Lab. Organización y Función del Cuerpo Humano",
+        "desc": "Espacio innovador con tecnología avanzada y disección virtual en 3D."
+      },
+      "salaSimulacion": {
+        "name": "Sala de Simulación Compleja Ginecobstetra",
+        "desc": "Espacio para practicar ginecología, obstetricia y neonatología con simuladores reales."
+      },
+      "salaDiseccion": {
+        "name": "Sala de Disección AR y VR",
+        "desc": "Centro de innovación con tecnología de realidad aumentada y virtual para disección sin cadáveres."
+      }
+    },
+    "arquitectura": {
+      "tallerArquitectura": {
+        "name": "Taller de Arquitectura",
+        "desc": "Ambiente especializado equipado para el diseño y realización de maquetas basadas en proyectos de clase."
+      },
+      "salaBIM": {
+        "name": "Sala BIM",
+        "desc": "Espacio con tecnología avanzada y modelos 3D para proyectos de construcción y diseño arquitectónico."
+      }
+    },
+    "derecho": {
+      "salaAudiencias": {
+        "name": "Sala de Audiencias",
+        "desc": "Espacio para actividades prácticas donde los estudiantes simulan audiencias procesales reales."
+      },
+      "salaDesignThinking": {
+        "name": "Sala Design Thinking",
+        "desc": "Espacio colaborativo para desarrollar soluciones innovadoras a problemas legales complejos."
+      }
+    },
+    "gastronomia": {
+      "labTecnicasDieteticas": {
+        "name": "Laboratorio de Técnicas Dietéticas",
+        "desc": "Centro de innovación en seguridad alimentaria con tecnología avanzada para nutrición y dietética."
+      },
+      "labProcesosIndustriales": {
+        "name": "Laboratorio de Procesos Industriales",
+        "desc": "Entorno educativo con cuatro plantas de producción: cerveza artesanal, néctares, snacks y más."
+      }
+    },
+    "ingenieriaCivil": {
+      "labConcretoSuelos": {
+        "name": "Lab. Tecnología del Concreto y Mecánica de Suelos",
+        "desc": "Realizarás pruebas normalizadas en concreto, suelos y asfalto con equipos de última generación."
+      },
+      "labHidraulica": {
+        "name": "Laboratorio Hidráulica",
+        "desc": "Laboratorio para estudiar el comportamiento del agua en canales, tuberías y estructuras hidráulicas."
+      },
+      "salaBIM": {
+        "name": "Sala BIM",
+        "desc": "Modelado de información de construcción con tecnología 3D para proyectos de ingeniería civil."
+      }
+    },
+    "software": {
+      "salaMacs": {
+        "name": "Sala con Macs",
+        "desc": "Ambientes especializados con equipos Apple para desarrollo de software, diseño y multimedia."
+      },
+      "salaDesignThinking": {
+        "name": "Sala Design Thinking",
+        "desc": "Espacio colaborativo para el pensamiento de diseño e innovación tecnológica."
+      },
+      "labMecatronica": {
+        "name": "Laboratorio de Mecatrónica",
+        "desc": "Laboratorio multidisciplinario para el diseño y desarrollo de sistemas robóticos inteligentes."
+      }
+    },
+    "psicologia": {
+      "camaraGesell": {
+        "name": "Cámara Gesell",
+        "desc": "Sala diseñada para entrevistas psicológicas, evaluaciones clínicas e intervenciones terapéuticas."
+      },
+      "salaDesignThinking": {
+        "name": "Sala Design Thinking",
+        "desc": "Espacio colaborativo para desarrollar soluciones innovadoras en salud mental y bienestar."
+      }
+    },
+    "marketing": {
+      "tallerAudiovisual": {
+        "name": "Taller de Producción Audiovisual",
+        "desc": "Espacio profesional equipado con ciclorama, chroma key, switcher y cámaras de cine."
+      },
+      "cabinaAudio": {
+        "name": "Cabina de Producción de Audio",
+        "desc": "Espacio diseñado específicamente para grabar y mezclar sonido de alta calidad profesional."
+      },
+      "salaMacs": {
+        "name": "Sala con Macs",
+        "desc": "Ambientes especializados con equipos Apple para diseño gráfico, edición y marketing digital."
+      }
+    },
+    "all": {
+      "hospitalSimulado": {
+        "name": "Hospital Simulado",
+        "desc": "Entorno innovador con simuladores avanzados para medicina y ciencias de la salud."
+      },
+      "salaAudiencias": {
+        "name": "Sala de Audiencias",
+        "desc": "Simulación de audiencias procesales reales para estudiantes de derecho."
+      },
+      "tallerArquitectura": {
+        "name": "Taller de Arquitectura",
+        "desc": "Diseño y maquetas para proyectos arquitectónicos."
+      },
+      "salaDesignThinking": {
+        "name": "Sala Design Thinking",
+        "desc": "Espacio colaborativo para innovación y pensamiento creativo."
+      },
+      "salaBIM": {
+        "name": "Sala BIM",
+        "desc": "Modelado 3D de proyectos de construcción y arquitectura."
+      },
+      "labMecatronica": {
+        "name": "Laboratorio de Mecatrónica",
+        "desc": "Robótica y sistemas mecatrónicos de última generación."
+      },
+      "camaraGesell": {
+        "name": "Cámara Gesell",
+        "desc": "Evaluaciones psicológicas e intervenciones terapéuticas."
+      },
+      "tallerAudiovisual": {
+        "name": "Taller de Producción Audiovisual",
+        "desc": "Producción de video profesional con ciclorama y chroma key."
+      }
+    }
   },
   "common": {
     "cargando": "Cargando...",
