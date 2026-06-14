@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/lib/i18n";
 import { useTestLogic, TEST_SESSION_KEY } from "../components/test/useTestLogic";
 import TestIntro from "../components/test/TestIntro";
 import QuestionCard from "../components/test/QuestionCard";
@@ -9,6 +10,7 @@ import Navbar from "@/components/Navbar";
 type SavedSession = { answers: string[]; current: number; score: number; savedAt: number };
 
 export default function TestPage() {
+  const { t } = useTranslation();
   const logic = useTestLogic();
   const [savedSession, setSavedSession] = useState<SavedSession | null>(null);
 

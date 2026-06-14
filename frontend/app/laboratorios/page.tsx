@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { useTranslation } from "@/lib/i18n";
 
 type Lab = {
   name: string;
@@ -192,6 +193,7 @@ const CAREER_META: Record<string, { title: string; emoji: string; color: string;
 };
 
 function LabGallery() {
+  const { t } = useTranslation();
   const params = useSearchParams();
   const careerKey = params.get("career") ?? "";
 
@@ -220,17 +222,19 @@ function LabGallery() {
           className="relative z-10"
         >
           <p className="text-white/60 text-sm uppercase tracking-widest font-medium mb-2">
-            Infraestructura UTP
+            {t("laboratorios.infraestructuraUtp")}
           </p>
           <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">
-            {meta ? `${meta.emoji} Laboratorios de ${meta.title}` : "🔬 Conoce nuestros Laboratorios"}
+            {meta ? `${meta.emoji} Laboratorios de ${meta.title}` : `${"🔬"} ${t("laboratorios.conoceNuestrosLaboratorios")}`}
           </h1>
           <p className="text-white/75 text-sm sm:text-base max-w-xl mx-auto">
-            Instalaciones de clase mundial diseñadas para que experimentes la profesión desde el primer día.
+            {t("laboratorios.instalacionesClaseMundial")}
           </p>
           <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-xs text-white/80 backdrop-blur-sm border border-white/20">
             <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-            {labs.length} laboratorio{labs.length !== 1 ? "s" : ""} disponible{labs.length !== 1 ? "s" : ""}
+            {labs.length === 1
+              ? t("laboratorios.unLaboratorioDisponible", { count: labs.length })
+              : t("laboratorios.laboratoriosDisponibles", { count: labs.length })}
           </div>
         </motion.div>
       </div>
@@ -296,10 +300,10 @@ function LabGallery() {
             className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:brightness-110"
             style={{ background: meta?.gradient ?? "linear-gradient(135deg,#1e3a8a,#3b82f6)" }}
           >
-            ← {careerKey ? "Volver al test vocacional" : "Explorar carreras"}
+            ← {careerKey ? t("laboratorios.volverAlTest") : t("laboratorios.explorarCarreras")}
           </a>
           <p className="mt-4 text-xs text-slate-400">
-            Información oficial de{" "}
+            {t("laboratorios.infoOficial")}{" "}
             <a
               href="https://www.utp.edu.pe/descubre-utp/"
               target="_blank"
@@ -316,11 +320,13 @@ function LabGallery() {
 }
 
 export default function LaboratoriosPage() {
+  const { t } = useTranslation();
+
   return (
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center bg-[linear-gradient(180deg,#f0f9ff,#e0f2fe)]">
-          <p className="text-slate-400">Cargando laboratorios...</p>
+          <p className="text-slate-400">{t("laboratorios.cargandoLaboratorios")}</p>
         </div>
       }
     >

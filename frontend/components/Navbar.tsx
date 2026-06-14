@@ -12,16 +12,23 @@ import { auth, db } from "@/src/firebase/config";
 import { logout } from "@/src/services/authService";
 import AvatarCustomizer from "@/app/components/avatar/AvatarCustomizer";
 import { loadAvatar } from "@/src/services/avatarService";
+import { useTranslation, type Locale, localeNames, localeFlags } from "@/lib/i18n";
 
-const NAV_LINKS = [
-  { label: "Inicio", href: "/" },
-  { label: "Test Vocacional", href: "/test" },
-  { label: "Explorar Carreras", href: "/carreras" },
-  { label: "Simular Carrera", href: "/simular", badge: "NEW" },
-  { label: "Comunidad", href: "/comunidad" },
-  { label: "Laboratorios", href: "/laboratorios" },
-  { label: "Mentor IA", href: "/mentor" },
-  { label: "Recursos", href: "/recursos" },
+const LANGUAGES: { locale: Locale; label: string; flag: string }[] = [
+  { locale: "es", label: "Español", flag: "🇵🇪" },
+  { locale: "en", label: "English", flag: "🇺🇸" },
+  { locale: "qu", label: "Runasimi", flag: "🏔️" },
+];
+
+const NAV_LINKS_TKEYS = [
+  { tkey: "nav.inicio", href: "/" },
+  { tkey: "nav.test", href: "/test" },
+  { tkey: "nav.carreras", href: "/carreras" },
+  { tkey: "nav.simular", href: "/simular", badge: "NEW" },
+  { tkey: "nav.comunidad", href: "/comunidad" },
+  { tkey: "nav.laboratorios", href: "/laboratorios" },
+  { tkey: "nav.mentor", href: "/mentor" },
+  { tkey: "nav.recursos", href: "/recursos" },
 ];
 
 type NavbarProps = {
@@ -48,6 +55,7 @@ export default function Navbar({
 }: NavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t, locale, setLocale } = useTranslation();
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [user, setUser] = useState<User | null>(null);
@@ -59,6 +67,8 @@ export default function Navbar({
   const avatarRef = useRef<HTMLDivElement>(null);
   const [notifs, setNotifs] = useState<Notif[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
 
   const displayName = userName || user?.displayName || user?.email?.split("@")[0] || "Usuario";
   const unreadCount = notifs.filter((n) => !n.read).length;
@@ -119,6 +129,18 @@ export default function Navbar({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [avatarMenuOpen]);
+
+  // Cierra el switcher de idioma al hacer clic fuera
+  useEffect(() => {
+    if (!langOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [langOpen]);
 
   // Notifications real-time listener
   useEffect(() => {
@@ -219,9 +241,9 @@ export default function Navbar({
           <span className="flex-1 text-center text-sm font-bold text-white px-4 truncate">{title}</span>
         ) : (
           <nav className="hidden lg:flex items-center gap-5 text-sm font-medium">
-            {NAV_LINKS.map((link) => (
+            {NAV_LINKS_TKEYS.map((link) => (
               <a key={link.href} href={link.href} className={`relative transition-colors ${isActive(link.href) ? linkActive : `${linkBase} ${linkHover}`}`}>
-                {link.label}
+                {t(link.tkey)}
                 {link.badge && (
                   <span className="absolute -top-2 -right-5 rounded-full bg-red-600 px-1.5 py-0.5 text-[8px] font-bold text-white leading-none">{link.badge}</span>
                 )}
@@ -229,6 +251,48 @@ export default function Navbar({
             ))}
           </nav>
         )}
+
+        {/* Language switcher */}
+        <div className="relative z-50" ref={langRef}>
+          <button
+            onClick={() => setLangOpen((v) => !v)}
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+              isDark ? "hover:bg-white/15 text-white/70" : "hover:bg-slate-100 text-slate-600"
+            }`}
+          >
+            <span>{localeFlags[locale]}</span>
+            <span className="hidden sm:inline">{localeNames[locale]}</span>
+            <svg className="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <AnimatePresence>
+            {langOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                transition={{ duration: 0.12 }}
+                className="absolute right-0 top-9 z-50 w-40 rounded-xl border border-slate-200 bg-white p-1 shadow-xl"
+              >
+                {LANGUAGES.map((l) => (
+                  <button
+                    key={l.locale}
+                    onClick={() => { setLocale(l.locale); setLangOpen(false); }}
+                    className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${
+                      locale === l.locale
+                        ? "bg-red-50 text-red-700"
+                        : "text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span>{l.flag}</span>
+                    <span>{l.label}</span>
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         <div className="flex items-center gap-2 shrink-0">
           {rightSlot !== undefined ? (
@@ -241,7 +305,7 @@ export default function Navbar({
                     className={`relative flex h-8 w-8 items-center justify-center rounded-full transition ${
                       isDark ? "text-white/70" : "text-slate-500"
                     }`}
-                    aria-label="Notificaciones"
+                    aria-label={t("nav.notificaciones")}
                     disabled
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,7 +331,7 @@ export default function Navbar({
                   {/* Texto "Bienvenido / email" — igual al diseño original pero con más info */}
                   <div className="hidden md:flex flex-col text-right leading-none mr-1">
                     <span className={`text-xs font-semibold ${brandName}`}>
-                      Bienvenido
+                      {t("nav.bienvenido")}
                     </span>
                     <span className={`text-[10px] ${brandSub}`}>{userEmail}</span>
                   </div>
@@ -282,7 +346,7 @@ export default function Navbar({
                       className={`relative flex h-8 w-8 items-center justify-center rounded-full transition ${
                         isDark ? "hover:bg-white/15 text-white/70" : "hover:bg-slate-100 text-slate-500"
                       }`}
-                      aria-label="Notificaciones"
+                      aria-label={t("nav.notificaciones")}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -314,13 +378,13 @@ export default function Navbar({
                           className="absolute right-0 top-10 w-72 rounded-2xl border border-slate-100 bg-white shadow-xl overflow-hidden"
                         >
                           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-                            <span className="text-sm font-bold text-slate-800">Notificaciones</span>
+                            <span className="text-sm font-bold text-slate-800">{t("nav.notificaciones")}</span>
                             {displayUnread > 0 && (
                               <button
                                 onClick={markAllRead}
                                 className="text-[11px] text-indigo-600 hover:underline"
                               >
-                                Marcar todo leído
+                                {t("nav.marcarTodoLeido")}
                               </button>
                             )}
                           </div>
@@ -332,7 +396,7 @@ export default function Navbar({
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                 </svg>
-                                <p className="text-xs">Sin notificaciones aún</p>
+                                <p className="text-xs">{t("nav.sinNotificaciones")}</p>
                               </div>
                             ) : (
                               notifs.map((n) => (
@@ -350,7 +414,7 @@ export default function Navbar({
                                   <div className="flex-1 min-w-0">
                                     <p className="text-xs font-semibold text-slate-800 leading-tight">
                                       <span className="text-indigo-600">{n.commenterName}</span>{" "}
-                                      comentó en tu publicación
+                                      {t("nav.comentoEnTuPublicacion")}
                                     </p>
                                     {n.commentText && (
                                       <p className="text-[11px] text-slate-500 mt-0.5 truncate">
@@ -375,7 +439,7 @@ export default function Navbar({
                                 onClick={() => setNotifOpen(false)}
                                 className="block text-center text-[11px] font-medium text-indigo-600 hover:underline"
                               >
-                                Ver comunidad →
+                                {t("nav.verComunidad")}
                               </a>
                             </div>
                           )}
@@ -411,14 +475,14 @@ export default function Navbar({
                               router.push("/perfil");
                             }}
                           >
-                            Ver perfil
+                            {t("nav.verPerfil")}
                           </button>
                           <button
                             type="button"
                             className="mt-1 w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
                             onClick={handleLogout}
                           >
-                            Cerrar sesión
+                            {t("nav.cerrarSesion")}
                           </button>
                         </motion.div>
                       )}
@@ -430,7 +494,7 @@ export default function Navbar({
           )}
 
           {!title && (
-            <button onClick={() => setMenuOpen((v) => !v)} className={`lg:hidden p-2 rounded-lg transition ${isDark ? "hover:bg-white/10" : "hover:bg-slate-100"}`} aria-label="Menú">
+            <button onClick={() => setMenuOpen((v) => !v)} className={`lg:hidden p-2 rounded-lg transition ${isDark ? "hover:bg-white/10" : "hover:bg-slate-100"}`} aria-label={t("nav.menu")}>
               <span className={`block h-0.5 w-5 transition-all duration-200 ${iconBar} ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
               <span className={`block h-0.5 w-5 mt-1.5 transition-all duration-200 ${iconBar} ${menuOpen ? "opacity-0" : ""}`} />
               <span className={`block h-0.5 w-5 mt-1.5 transition-all duration-200 ${iconBar} ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
@@ -443,9 +507,9 @@ export default function Navbar({
         {menuOpen && !title && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="lg:hidden overflow-hidden" style={{ background: mobileMenuBg, backdropFilter: "blur(18px)", borderTop: `1px solid ${wrapBorder}` }}>
             <nav className="flex flex-col px-4 py-3 gap-0.5">
-              {NAV_LINKS.map((link) => (
+              {NAV_LINKS_TKEYS.map((link) => (
                 <a key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${isActive(link.href) ? mobileItemActive : mobileItemDefault}`}>
-                  {link.label}
+                  {t(link.tkey)}
                   {link.badge && (
                     <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[8px] font-bold text-white leading-none">
                       {link.badge}
@@ -465,7 +529,7 @@ export default function Navbar({
                     onClick={() => setMenuOpen(false)}
                     className={`flex rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${mobileItemDefault}`}
                   >
-                    Ver perfil
+                    {t("nav.verPerfil")}
                   </a>
                   <button
                     onClick={() => { setMenuOpen(false); handleLogout(); }}
@@ -473,7 +537,7 @@ export default function Navbar({
                       isDark ? "text-white/50 hover:bg-white/10" : "text-slate-500 hover:bg-slate-50"
                     }`}
                   >
-                    Cerrar sesión
+                    {t("nav.cerrarSesion")}
                   </button>
                 </>
               )}

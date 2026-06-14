@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Navbar from "@/components/Navbar";
+import { useTranslation } from "@/lib/i18n";
 
 import {
   Card,
@@ -9,76 +10,75 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const resourceCards = [
-  {
-    title: "Portal UTP Perú",
-    description:
-      "Accede al sitio oficial de la Universidad Tecnológica del Perú y toda la información institucional.",
-    href: "https://www.utp.edu.pe",
-    image:
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    title: "Admisión UTP",
-    description:
-      "Revisa requisitos, fechas de postulación y guías completas para postular a UTP.",
-    href: "/recursos/admision",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    title: "Carreras UTP",
-    description:
-      "Explora las carreras profesionales, áreas de enseñanza y las sedes disponibles.",
-    href: "/carreras",
-    buttonText: "Ver Carreras UTP",
-    image:
-      "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=900&q=80",
-  },
-];
-
-const utpResources = [
-  {
-    title: "Campus UTP",
-    description: "Conoce nuestras sedes, laboratorios y espacios para estudiantes.",
-    icon: "🏫",
-  },
-  {
-    title: "Carreras destacadas",
-    description: "Explora programas como Ingeniería de Software, Diseño Digital y Gestión Empresarial.",
-    icon: "🎓",
-  },
-  {
-    title: "Becas y apoyos",
-    description: "Encuentra los apoyos económicos disponibles para estudiantes nuevos.",
-    icon: "💰",
-  },
-  {
-    title: "Talleres UTP",
-    description: "Participa en sesiones de orientación, entrevistas y preparación académica.",
-    icon: "📘",
-  },
-];
-
-const studentServices = [
-  {
-    title: "Mentorías vocacionales",
-    detail: "Sesiones personalizadas para definir tus intereses y opciones de estudio.",
-    icon: "🧭",
-  },
-  {
-    title: "Asesoría de admisión",
-    detail: "Guía paso a paso para preparar tu postulación y documentos.",
-    icon: "📝",
-  },
-  {
-    title: "Financiamiento UTP",
-    detail: "Becas parciales, programas de apoyo y facilidades de pago.",
-    icon: "🤝",
-  },
-];
-
 export default function ResourcesPage() {
+  const { t } = useTranslation();
+
+  const resourceCards = [
+    {
+      title: t("recursos.portalUtpPeru"),
+      description: t("recursos.portalUtpPeruDesc"),
+      href: "https://www.utp.edu.pe",
+      image:
+        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80",
+    },
+    {
+      title: t("recursos.admisionUtp"),
+      description: t("recursos.admisionUtpDesc"),
+      href: "/recursos/admision",
+      image:
+        "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80",
+    },
+    {
+      title: t("recursos.carrerasUtp"),
+      description: t("recursos.carrerasUtpDesc"),
+      href: "/carreras",
+      buttonText: t("recursos.verCarrerasUtp"),
+      image:
+        "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=900&q=80",
+    },
+  ];
+
+  const utpResources = [
+    {
+      title: t("recursos.campusUtp"),
+      description: t("recursos.campusUtpDesc"),
+      icon: "🏫",
+    },
+    {
+      title: t("recursos.carrerasDestacadas"),
+      description: t("recursos.carrerasDestacadasDesc"),
+      icon: "🎓",
+    },
+    {
+      title: t("recursos.becasApoyos"),
+      description: t("recursos.becasApoyosDesc"),
+      icon: "💰",
+    },
+    {
+      title: t("recursos.talleresUtp"),
+      description: t("recursos.talleresUtpDesc"),
+      icon: "📘",
+    },
+  ];
+
+  const studentServices = [
+    {
+      title: t("recursos.mentoriasVocacionales"),
+      detail: t("recursos.mentoriasVocacionalesDesc"),
+      icon: "🧭",
+    },
+    {
+      title: t("recursos.asesoriaAdmision"),
+      detail: t("recursos.asesoriaAdmisionDesc"),
+      icon: "📝",
+    },
+    {
+      title: t("recursos.financiamientoUtp"),
+      detail: t("recursos.financiamientoUtpDesc"),
+      icon: "🤝",
+    },
+  ];
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.16),transparent_30%),radial-gradient(circle_at_top_right,rgba(244,63,94,0.14),transparent_26%),linear-gradient(180deg,#fff5f5_0%,#fdf2f2_100%)] text-slate-950">
       {/* Navbar compartido — incluye menú de avatar con Ver perfil y Cerrar sesión */}
@@ -104,23 +104,22 @@ export default function ResourcesPage() {
               </svg>
             </div>
             <h1 className="text-5xl font-black tracking-tight text-slate-950 sm:text-6xl animate-fade-up animate-delay-300">
-              Recursos UTP para impulsar tu ingreso a la universidad.
+              {t("recursos.heroTitle")}
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl animate-fade-up animate-delay-400">
-              Información, eventos y apoyo diseñado para futuros estudiantes de la UTP.
-              Aprende qué estudiar, cómo postular y qué becas están disponibles.
+              {t("recursos.heroDesc")}
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-4xl bg-white/90 p-6 shadow-[0_25px_70px_rgba(220,38,38,0.08)] border border-white/80 animate-fade-up animate-delay-500 transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_30px_80px_rgba(220,38,38,0.12)]">
-                <p className="text-sm uppercase tracking-[0.2em] text-red-600">Becas UTP</p>
+                <p className="text-sm uppercase tracking-[0.2em] text-red-600">{t("recursos.becasUtp")}</p>
                 <p className="mt-4 text-lg font-semibold text-slate-950">
-                  Apoyos económicos y planes de pago flexibles.
+                  {t("recursos.becasUtpDesc")}
                 </p>
               </div>
               <div className="rounded-4xl bg-white/90 p-6 shadow-[0_25px_70px_rgba(220,38,38,0.08)] border border-white/80 animate-fade-up animate-delay-600 transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_30px_80px_rgba(220,38,38,0.12)]">
-                <p className="text-sm uppercase tracking-[0.2em] text-orange-700">Talleres</p>
+                <p className="text-sm uppercase tracking-[0.2em] text-orange-700">{t("recursos.talleresLabel")}</p>
                 <p className="mt-4 text-lg font-semibold text-slate-950">
-                  Sesiones para presentar tu perfil y conocer carreras.
+                  {t("recursos.talleresLabelDesc")}
                 </p>
               </div>
             </div>
@@ -132,10 +131,10 @@ export default function ResourcesPage() {
                 📚
               </div>
               <div className="mt-6">
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Recursos</p>
-                <p className="mt-3 text-4xl font-black text-slate-950">UTP Guide</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{t("recursos.recursosLabel")}</p>
+                <p className="mt-3 text-4xl font-black text-slate-950">{t("recursos.utpGuide")}</p>
                 <p className="mt-4 text-sm leading-6 text-slate-600">
-                  Recopilación de guías, fechas, carreras y becas oficiales de la UTP.
+                  {t("recursos.utpGuideDesc")}
                 </p>
                 <a
                   href="https://www.utp.edu.pe/guias-del-estudiante-de-2026-i"
@@ -143,17 +142,17 @@ export default function ResourcesPage() {
                   rel="noreferrer"
                   className="mt-6 inline-flex rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition duration-300 transform hover:-translate-y-0.5 hover:bg-red-700"
                 >
-                  Ver Guía 2026-I
+                  {t("recursos.verGuia")}
                 </a>
               </div>
             </div>
             <div className="rounded-[2.5rem] bg-gradient-to-br from-red-600 via-rose-600 to-orange-500 p-8 shadow-[0_35px_100px_rgba(220,38,38,0.22)] text-white animate-fade-up animate-delay-600 transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_40px_110px_rgba(220,38,38,0.28)]">
               <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-white/10 text-2xl">✨</div>
               <div className="mt-6">
-                <p className="text-xs uppercase tracking-[0.24em] text-red-100">Éxito</p>
-                <p className="mt-3 text-4xl font-black">UTP en tu futuro</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-red-100">{t("recursos.exito")}</p>
+                <p className="mt-3 text-4xl font-black">{t("recursos.utpEnTuFuturo")}</p>
                 <p className="mt-4 text-sm leading-6 text-red-100/90">
-                  Prepárate para un camino más claro con contenidos diseñados para tus intereses y metas.
+                  {t("recursos.utpEnTuFuturoDesc")}
                 </p>
               </div>
             </div>
@@ -180,7 +179,7 @@ export default function ResourcesPage() {
                   rel={card.href.startsWith("http") ? "noreferrer" : undefined}
                   className="mt-6 inline-flex rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition duration-300 transform hover:-translate-y-0.5 hover:bg-red-100"
                 >
-                  {card.buttonText ?? "Ir al recurso"}
+                  {card.buttonText ?? t("recursos.irAlRecurso")}
                 </a>
               </CardContent>
             </Card>

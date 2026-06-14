@@ -11,6 +11,7 @@ import {
 import { auth, db } from "@/src/firebase/config";
 import Navbar from "@/components/Navbar";
 import { trackBadgeEvent, showBadgeNotification } from "@/src/services/badgeService";
+import { useTranslation } from "@/lib/i18n";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -62,12 +63,16 @@ function toDate(val: unknown): Date {
   return new Date(val as string);
 }
 
-function timeAgo(date: Date): string {
+function timeAgo(date: Date, t: (key: string) => string): string {
   const diff = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (diff < 60)     return "hace unos segundos";
-  if (diff < 3600)   return `hace ${Math.floor(diff / 60)} min`;
-  if (diff < 86400)  return `hace ${Math.floor(diff / 3600)} h`;
-  if (diff < 604800) return `hace ${Math.floor(diff / 86400)} d`;
+  const hace = t("comunidad.hace");
+  if (diff < 60)     return `${hace} ${t("comunidad.segundos")}`.trim();
+  const mins = Math.floor(diff / 60);
+  if (diff < 3600)   return `${hace} ${mins} ${t("comunidad.min")}`.trim();
+  const hours = Math.floor(diff / 3600);
+  if (diff < 86400)  return `${hace} ${hours} ${hours !== 1 ? t("comunidad.horas") : t("comunidad.hora")}`.trim();
+  const days = Math.floor(diff / 86400);
+  if (diff < 604800) return `${hace} ${days} ${days !== 1 ? t("comunidad.dias") : t("comunidad.dia")}`.trim();
   return date.toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" });
 }
 
@@ -104,6 +109,7 @@ function CommentSection({
   const [open, setOpen]         = useState(false);
   const [text, setText]         = useState("");
   const [sending, setSending]   = useState(false);
+  const { t } = useTranslation();
 
   const loadComments = useCallback(async () => {
     if (loaded) return;
@@ -193,7 +199,7 @@ function CommentSection({
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        {count > 0 ? `${count} comentario${count !== 1 ? "s" : ""}` : "Comentar"}
+        {count > 0 ? `${count} ${count !== 1 ? t("comunidad.comentarios") : t("comunidad.comentario")}` : t("comunidad.comentar")}
       </button>
 
       <AnimatePresence>
@@ -211,7 +217,7 @@ function CommentSection({
                   <div className="h-3 w-32 rounded-full bg-slate-100" />
                 </div>
               ) : comments.length === 0 ? (
-                <p className="text-xs text-slate-400 text-center py-2">Sé el primero en comentar ✨</p>
+                <p className="text-xs text-slate-400 text-center py-2">{t("comunidad.seElPrimeroComentar")}</p>
               ) : (
                 <AnimatePresence initial={false}>
                 {comments.map((c) => (
@@ -230,7 +236,7 @@ function CommentSection({
                         {c.userId === currentUserId && (
                           <button
                             onClick={() => deleteComment(c.id)}
-                            title="Eliminar comentario"
+                            title={t("comunidad.eliminarComentario")}
                             className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white border border-slate-200 text-slate-300 shadow-sm transition-all hover:text-red-500 hover:border-red-200 opacity-0 group-hover:opacity-100"
                           >
                             <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,7 +245,7 @@ function CommentSection({
                           </button>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-0.5 ml-2">{timeAgo(c.createdAt)}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5 ml-2">{timeAgo(c.createdAt, t)}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -255,7 +261,7 @@ function CommentSection({
                       value={text}
                       onChange={(e) => setText(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(); } }}
-                      placeholder="Escribe un comentario..."
+                      placeholder={t("comunidad.escribirComentario")}
                       className="flex-1 resize-none rounded-2xl rounded-tl-sm border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-300 focus:bg-white transition-colors"
                       style={{ minHeight: 36 }}
                     />
@@ -273,7 +279,7 @@ function CommentSection({
                 </div>
               ) : (
                 <p className="text-xs text-slate-400 text-center">
-                  <a href="/login" className="text-indigo-600 hover:underline font-medium">Inicia sesión</a> para comentar
+                  <a href="/login" className="text-indigo-600 hover:underline font-medium">{t("comunidad.iniciarSesion")}</a> {t("comunidad.paraComentar")}
                 </p>
               )}
             </div>
@@ -302,6 +308,7 @@ function PostCard({
   const [menuOpen, setMenuOpen]       = useState(false);
   const [confirming, setConfirming]   = useState(false);
   const [deleting, setDeleting]       = useState(false);
+  const { t } = useTranslation();
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -336,7 +343,7 @@ function PostCard({
               {meta.label}
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-0.5">{timeAgo(post.createdAt)}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">{timeAgo(post.createdAt, t)}</p>
         </div>
 
         {/* Menú de opciones — solo al dueño del post */}
@@ -369,12 +376,12 @@ function PostCard({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
-                      Eliminar post
+                      {t("comunidad.eliminarPost")}
                     </button>
                   ) : (
                     <div className="px-4 py-3">
                       <p className="text-xs font-semibold text-slate-700 mb-2.5">
-                        ¿Eliminar esta publicación?
+                        {t("comunidad.confirmarEliminar")}
                       </p>
                       <div className="flex gap-2">
                         <button
@@ -382,13 +389,13 @@ function PostCard({
                           disabled={deleting}
                           className="flex-1 rounded-lg bg-red-600 py-1.5 text-xs font-bold text-white transition hover:bg-red-700 disabled:opacity-60"
                         >
-                          {deleting ? "..." : "Sí, eliminar"}
+                          {deleting ? "..." : t("comunidad.siEliminar")}
                         </button>
                         <button
                           onClick={() => { setConfirming(false); setMenuOpen(false); }}
                           className="flex-1 rounded-lg border border-slate-200 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
                         >
-                          Cancelar
+                          {t("common.cancelar")}
                         </button>
                       </div>
                     </div>
@@ -417,7 +424,7 @@ function PostCard({
             {isLiked ? "❤️" : "🤍"}
           </motion.span>
           {post.likeCount > 0 && <span>{post.likeCount}</span>}
-          <span>Me gusta</span>
+          <span>{t("comunidad.meGusta")}</span>
         </button>
 
         <CommentSection
@@ -445,6 +452,7 @@ function PostComposer({
   const [text, setText]           = useState("");
   const [career, setCareer]       = useState("general");
   const [submitting, setSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   const submit = async () => {
     if (!currentUserId || !text.trim() || submitting) return;
@@ -486,12 +494,12 @@ function PostComposer({
   if (!currentUserId) {
     return (
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 text-center">
-        <p className="text-slate-500 text-sm mb-3">Únete a la conversación de la comunidad Vocatio</p>
+        <p className="text-slate-500 text-sm mb-3">{t("comunidad.uneteConversacion")}</p>
         <a
           href="/login"
           className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-500 px-5 py-2.5 text-sm font-semibold text-white shadow hover:brightness-110 transition"
         >
-          Iniciar sesión para publicar
+          {t("comunidad.iniciarSesionParaPublicar")}
         </a>
       </div>
     );
@@ -506,7 +514,7 @@ function PostComposer({
             rows={3}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="¿Qué quieres compartir con la comunidad?"
+            placeholder={t("comunidad.queQuieresCompartir")}
             className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-300 focus:bg-white transition-colors"
           />
           <div className="mt-3 flex items-center justify-between gap-2">
@@ -516,8 +524,8 @@ function PostComposer({
               disabled={submitting}
               className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 focus:outline-none focus:border-indigo-300 cursor-pointer disabled:opacity-40"
             >
-              {CAREER_TABS.map((t) => (
-                <option key={t.value} value={t.value}>{t.label}</option>
+              {CAREER_TABS.map((tab) => (
+                <option key={tab.value} value={tab.value}>{tab.label}</option>
               ))}
             </select>
 
@@ -528,8 +536,8 @@ function PostComposer({
               className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-500 px-4 py-2 text-xs font-bold text-white shadow hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting
-                ? <><div className="h-3.5 w-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />Publicando...</>
-                : "Publicar"
+                ? <><div className="h-3.5 w-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />{t("comunidad.publicando")}</>
+                : t("comunidad.publicar")
               }
             </motion.button>
           </div>
@@ -551,6 +559,7 @@ export default function ComunidadPage() {
   const [hasMore, setHasMore]                 = useState(true);
   const [currentUserId, setCurrentUserId]     = useState("");
   const [currentUserName, setCurrentUserName] = useState("");
+  const { t } = useTranslation();
 
   // Refs to avoid stale closures in IntersectionObserver
   const lastDocRef     = useRef<QueryDocumentSnapshot | null>(null);
@@ -711,18 +720,18 @@ export default function ComunidadPage() {
         </div>
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-10 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="text-indigo-300 text-xs uppercase tracking-widest font-semibold mb-2">Vocatio · Red Social</p>
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">Comunidad Vocatio 🎓</h1>
+            <p className="text-indigo-300 text-xs uppercase tracking-widest font-semibold mb-2">{t("comunidad.vocatioRedSocial")}</p>
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">{t("comunidad.comunidadVocatio")}</h1>
             <p className="text-indigo-200 text-sm max-w-md mx-auto">
-              Comparte experiencias, consejos y momentos con estudiantes de todas las carreras.
+              {t("comunidad.comparteExperiencias")}
             </p>
             <div className="mt-4 flex items-center justify-center gap-4 text-xs text-indigo-300">
               <span className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-                Comunidad activa
+                {t("comunidad.comunidadActiva")}
               </span>
               <span>·</span>
-              <span>{posts.length > 0 ? `${posts.length}+ publicaciones` : "Comunidad activa"}</span>
+              <span>{posts.length > 0 ? `${posts.length}+ ${t("comunidad.publicaciones")}` : t("comunidad.comunidadActiva")}</span>
             </div>
           </motion.div>
         </div>
@@ -756,7 +765,7 @@ export default function ComunidadPage() {
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 rounded-full" style={{ background: activeMeta.color }} />
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-            {activeMeta.label}{activeCareer === "general" ? " — todos los posts" : ""}
+            {activeMeta.label}{activeCareer === "general" ? ` — ${t("comunidad.todosLosPosts")}` : ""}
           </span>
         </div>
 
@@ -784,9 +793,9 @@ export default function ComunidadPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
             <span className="text-5xl block mb-4">🌱</span>
             <p className="text-slate-600 font-semibold">
-              {activeCareer === "general" ? "La comunidad está creciendo..." : `No hay posts en ${activeMeta.label} todavía.`}
+              {activeCareer === "general" ? t("comunidad.creciendo") : t("comunidad.noHayPosts", { label: activeMeta.label })}
             </p>
-            <p className="text-slate-400 text-sm mt-1">¡Sé el primero en publicar!</p>
+            <p className="text-slate-400 text-sm mt-1">{t("comunidad.seElPrimero")}</p>
           </motion.div>
         ) : (
           <AnimatePresence mode="popLayout">
@@ -809,12 +818,12 @@ export default function ComunidadPage() {
           {loadingMore && (
             <div className="flex items-center gap-2 text-slate-400">
               <div className="h-4 w-4 rounded-full border-2 border-slate-200 border-t-indigo-500 animate-spin" />
-              <span className="text-xs">Cargando más publicaciones...</span>
+              <span className="text-xs">{t("comunidad.cargandoMas")}</span>
             </div>
           )}
           {!loading && !loadingMore && !hasMore && posts.length > 0 && (
             <p className="text-xs text-slate-400">
-              Has visto todos los posts de {activeMeta.label} ✓
+              {t("comunidad.vistoTodosPosts", { label: activeMeta.label })}
             </p>
           )}
         </div>

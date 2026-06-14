@@ -14,11 +14,12 @@ import { fetchUserBadges } from "@/src/services/badgeService";
 import BadgeDisplay from "@/app/components/BadgeDisplay";
 import SkillAssessment from "./components/SkillAssessment";
 import SkillGapDashboard from "./components/SkillGapDashboard";
+import { useTranslation } from "@/lib/i18n";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-const formatDate = (value: unknown) => {
-  if (!value) return "No disponible";
+const formatDate = (value: unknown, t: (key: string) => string) => {
+  if (!value) return t("common.noDisponible");
   if (value instanceof Timestamp) {
     return value.toDate().toLocaleDateString("es-PE", {
       day: "2-digit",
@@ -33,7 +34,7 @@ const formatDate = (value: unknown) => {
       year: "numeric",
     });
   } catch {
-    return "No disponible";
+    return t("common.noDisponible");
   }
 };
 
@@ -83,17 +84,18 @@ type TestHistoryEntry = {
 // ─── Admisión steps ──────────────────────────────────────────────────────────
 
 const ETAPAS_ADMISION = [
-  { id: "registro",    label: "Registro de postulante" },
-  { id: "documentos", label: "Carga de documentos" },
-  { id: "examen",     label: "Examen de admisión" },
-  { id: "resultado",  label: "Resultado" },
-  { id: "matricula",  label: "Matrícula" },
+  { id: "registro" },
+  { id: "documentos" },
+  { id: "examen" },
+  { id: "resultado" },
+  { id: "matricula" },
 ];
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function PerfilPage() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   // Auth & profile
   const [user,    setUser]    = useState<User | null>(null);
@@ -206,7 +208,7 @@ export default function PerfilPage() {
         nombre:        (foundProfile?.nombre        as string) || displayName || email.split("@")[0] || "Usuario",
         email,
         rol:           (foundProfile?.rol           as string) || "Estudiante",
-        fechaRegistro: foundProfile?.fechaRegistro  ? formatDate(foundProfile.fechaRegistro) : "No disponible",
+        fechaRegistro: foundProfile?.fechaRegistro  ? formatDate(foundProfile.fechaRegistro, t) : t("common.noDisponible"),
         carrera:       (foundProfile?.carrera       as string) || undefined,
         telefono:      (foundProfile?.telefono      as string) || undefined,
         dni:           (foundProfile?.dni           as string) || undefined,
@@ -273,7 +275,7 @@ export default function PerfilPage() {
     });
 
     return () => unsubscribe();
-  }, [router]);
+  }, [router, t]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
@@ -380,7 +382,7 @@ export default function PerfilPage() {
       setCarrerasAnalizadas(enriquecidas);
     } catch (e) {
       console.error(e);
-      setErrorAnalisis("Ocurrió un error al analizar las carreras. Intenta de nuevo.");
+      setErrorAnalisis(t("perfil.errorAnalisis"));
     } finally {
       setAnalizando(false);
     }
@@ -394,7 +396,7 @@ export default function PerfilPage() {
         <div className="flex flex-col items-center gap-4">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-red-200 border-t-red-600" />
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
-            Cargando perfil...
+            {t("common.cargandoPerfil")}
           </p>
         </div>
       </main>
@@ -404,11 +406,11 @@ export default function PerfilPage() {
   const currentEtapaIndex = ETAPAS_ADMISION.findIndex((e) => e.id === profile.etapaAdmision);
 
   const datosAdicionales: { label: string; value?: string }[] = [
-    { label: "Carrera de interés",   value: profile.carrera  },
-    { label: "DNI",                  value: profile.dni      },
-    { label: "Teléfono",             value: profile.telefono },
-    { label: "Modalidad de ingreso", value: profile.modalidad },
-    { label: "Sede",                 value: profile.sede     },
+    { label: t("perfil.carreraInteres"),   value: profile.carrera  },
+    { label: t("perfil.dni"),              value: profile.dni      },
+    { label: t("perfil.telefono"),         value: profile.telefono },
+    { label: t("perfil.modalidadIngreso"), value: profile.modalidad },
+    { label: t("perfil.sede"),             value: profile.sede     },
   ].filter((item) => item.value);
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -426,20 +428,20 @@ export default function PerfilPage() {
               </div>
               <div className="text-center sm:text-left">
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
-                  Perfil del estudiante
+                  {t("perfil.perfilEstudiante")}
                 </p>
                 <h1 className="text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl">
                   {profile.nombre}
                 </h1>
                 <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
-                  Aquí encontrarás toda la información disponible de tu cuenta y tu proceso de admisión.
+                  {t("perfil.infoCuenta")}
                 </p>
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-3 lg:justify-end">
-              <Button onClick={handleVolver} variant="outline">← Volver</Button>
+              <Button onClick={handleVolver} variant="outline">← {t("common.volver")}</Button>
               <Button onClick={handleLogout} className="bg-red-600 text-white hover:bg-red-700">
-                Cerrar sesión
+                {t("perfil.cerrarSesion")}
               </Button>
             </div>
           </div>
@@ -454,14 +456,14 @@ export default function PerfilPage() {
             {/* ── Datos personales ── */}
             <div className="space-y-3 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
-                Datos personales
+                {t("perfil.datosPersonales")}
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
-                  { label: "Nombre",            value: profile.nombre        },
-                  { label: "Correo",            value: profile.email         },
-                  { label: "Rol",               value: profile.rol           },
-                  { label: "Fecha de registro", value: profile.fechaRegistro },
+                  { label: t("perfil.nombre"),            value: profile.nombre        },
+                  { label: t("perfil.correo"),            value: profile.email         },
+                  { label: t("perfil.rol"),               value: profile.rol           },
+                  { label: t("perfil.fechaRegistro"),     value: profile.fechaRegistro },
                 ].map((item) => (
                   <div key={item.label} className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                     <p className="text-sm uppercase tracking-[0.18em] text-slate-500">{item.label}</p>
@@ -488,7 +490,7 @@ export default function PerfilPage() {
               {/* Header del card */}
               <div className="flex items-center justify-between mb-1">
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
-                  Mis intereses y hobbys
+                  {t("perfil.misInteresesHobbys")}
                 </p>
                 {/* Botón Editar (solo visible cuando NO está en modo edición y hay tags) */}
                 {!modoEdicion && (
@@ -496,15 +498,15 @@ export default function PerfilPage() {
                     onClick={handleEditar}
                     className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
                   >
-                    ✏️ Editar
+                    {t("perfil.editarBtn")}
                   </button>
                 )}
               </div>
 
               <p className="mb-5 text-sm text-slate-500">
                 {modoEdicion
-                  ? <>Escribe un interés y presiona <kbd className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-mono text-slate-600">Enter</kbd> para agregarlo.</>
-                  : "Tus intereses y hobbys registrados."}
+                  ? <>{t("perfil.escribeInteresAntes")}<kbd className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-mono text-slate-600">Enter</kbd>{t("perfil.escribeInteresDespues")}</>
+                  : t("perfil.tusInteresesRegistrados")}
               </p>
 
               {/* ── MODO EDICIÓN ── */}
@@ -538,14 +540,14 @@ export default function PerfilPage() {
                       value={inputInteres}
                       onChange={(e) => setInputInteres(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder={intereses.length === 0 ? "Ej: programación, música, diseño..." : "Agregar más..."}
+                      placeholder={intereses.length === 0 ? t("perfil.ejemploInteres") : t("perfil.agregarMas")}
                       className="min-w-[160px] flex-1 bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
                     />
                   </div>
 
                   {intereses.length === 0 && (
                     <p className="text-center text-sm text-slate-400 py-2">
-                      Aún no has agregado intereses. ¡Empieza escribiendo arriba!
+                      {t("perfil.sinInteresesEdicion")}
                     </p>
                   )}
 
@@ -559,10 +561,10 @@ export default function PerfilPage() {
                       {guardando ? (
                         <span className="flex items-center gap-2">
                           <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                          Guardando...
+                          {t("common.guardando")}
                         </span>
                       ) : (
-                        "💾 Guardar"
+                        `💾 ${t("common.guardar")}`
                       )}
                     </Button>
                     <Button
@@ -570,7 +572,7 @@ export default function PerfilPage() {
                       variant="outline"
                       className="border-slate-200 text-slate-600 hover:bg-slate-50"
                     >
-                      Cancelar
+                      {t("common.cancelar")}
                     </Button>
                   </div>
                 </div>
@@ -583,13 +585,13 @@ export default function PerfilPage() {
                     <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 py-8 text-center">
                       <span className="text-3xl">🎯</span>
                       <p className="text-sm text-slate-500">
-                        Aún no tienes intereses registrados.
+                        {t("perfil.sinInteresesVista")}
                       </p>
                       <button
                         onClick={handleEditar}
                         className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
                       >
-                        + Agregar ahora
+                        {t("perfil.agregarAhora")}
                       </button>
                     </div>
                   ) : (
@@ -615,7 +617,7 @@ export default function PerfilPage() {
                             exit={{ opacity: 0 }}
                             className="flex items-center gap-1.5 text-sm font-medium text-green-600"
                           >
-                            <span className="text-base">✓</span> Intereses guardados correctamente
+                            <span className="text-base">✓</span> {t("perfil.interesesGuardados")}
                           </motion.p>
                         )}
                       </AnimatePresence>
@@ -629,10 +631,10 @@ export default function PerfilPage() {
                         {analizando ? (
                           <>
                             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                            Analizando...
+                            {t("perfil.analizando")}
                           </>
                         ) : (
-                          <>🎓 Analizar posibles carreras</>
+                          <>🎓 {t("perfil.analizarCarreras")}</>
                         )}
                       </button>
                     </>
@@ -662,10 +664,10 @@ export default function PerfilPage() {
                         <div className="border-t border-slate-100 pt-6">
                           <div className="mb-4 flex items-center justify-between">
                             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-600">
-                              Carreras recomendadas para ti
+                              {t("perfil.carrerasRecomendadasTi")}
                             </p>
                             <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-600">
-                              Resultados generados
+                              {t("perfil.resultadosGenerados")}
                             </span>
                           </div>
 
@@ -719,7 +721,7 @@ export default function PerfilPage() {
                           </div>
 
                           <p className="mt-4 text-center text-xs text-slate-400">
-                            Análisis generado por IA · Los resultados son orientativos
+                            {t("perfil.analisisIA")}
                           </p>
                         </div>
                       </motion.div>
@@ -733,10 +735,10 @@ export default function PerfilPage() {
             {user && (
               <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600 mb-4">
-                  Carrera de interés
+                  {t("perfil.carreraInteres")}
                 </p>
                 <p className="text-sm text-slate-500 mb-4">
-                  Selecciona la carrera que te interesa para desbloquear el análisis de skills.
+                  {t("perfil.seleccionaCarrera")}
                 </p>
                 <select
                   value={profile.carrera || ""}
@@ -749,7 +751,7 @@ export default function PerfilPage() {
                   }}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-100"
                 >
-                  <option value="">— Selecciona una carrera —</option>
+                  <option value="">{t("perfil.seleccionaCarreraOpcion")}</option>
                   {careers.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.emoji} {c.title}
@@ -776,7 +778,7 @@ export default function PerfilPage() {
             {/* ── Proceso de admisión ── */}
             <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
-                Proceso de admisión
+                {t("perfil.procesoAdmision")}
               </p>
               <ol className="mt-6 space-y-0">
                 {ETAPAS_ADMISION.map((etapa, index) => {
@@ -803,10 +805,10 @@ export default function PerfilPage() {
                       </span>
                       <div className="pt-1">
                         <p className={`text-base font-semibold ${isCurrent ? "text-red-700" : isDone ? "text-slate-900" : "text-slate-500"}`}>
-                          {etapa.label}
+                          {t(`perfil.etapa_${etapa.id}`)}
                         </p>
                         {isCurrent && (
-                          <p className="mt-1 text-sm text-slate-500">Estás en esta etapa actualmente.</p>
+                          <p className="mt-1 text-sm text-slate-500">{t("perfil.etapaActual")}</p>
                         )}
                       </div>
                     </li>
@@ -815,7 +817,7 @@ export default function PerfilPage() {
               </ol>
               {currentEtapaIndex < 0 && (
                 <p className="mt-2 text-sm text-slate-500">
-                  Aún no se ha registrado tu avance en el proceso de admisión.
+                  {t("perfil.sinAvance")}
                 </p>
               )}
             </div>
@@ -823,12 +825,12 @@ export default function PerfilPage() {
             {/* ── Consejos rápidos ── */}
             <div className="rounded-[2rem] border border-slate-200 bg-red-50 p-6">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
-                Consejos rápidos
+                {t("perfil.consejosRapidos")}
               </p>
               <ul className="mt-4 space-y-3 text-slate-700">
-                <li>1. Revisa tu correo para información del proceso de admisión.</li>
-                <li>2. Completa tu perfil en caso tengas más datos disponibles.</li>
-                <li>3. Usa el menú de Recursos para explorar carreras y admisión UTP.</li>
+                <li>{t("perfil.consejo1")}</li>
+                <li>{t("perfil.consejo2")}</li>
+                <li>{t("perfil.consejo3")}</li>
               </ul>
             </div>
           </div>
@@ -836,10 +838,10 @@ export default function PerfilPage() {
           {/* ── Columna derecha (aside) ── */}
           <aside className="space-y-6">
             <div className="rounded-[2rem] bg-gradient-to-br from-red-600 to-rose-500 p-6 text-white shadow-xl">
-              <p className="text-sm uppercase tracking-[0.24em]">Estado de perfil</p>
-              <p className="mt-4 text-3xl font-bold">Activo</p>
+              <p className="text-sm uppercase tracking-[0.24em]">{t("perfil.estadoPerfil")}</p>
+              <p className="mt-4 text-3xl font-bold">{t("perfil.activo")}</p>
               <p className="mt-3 text-sm text-red-100">
-                Tu cuenta está registrada y has iniciado sesión correctamente.
+                {t("perfil.cuentaRegistrada")}
               </p>
             </div>
 
@@ -852,7 +854,7 @@ export default function PerfilPage() {
               return (
                 <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
                   <p className="mb-5 text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
-                    Tu perfil vocacional
+                    {t("perfil.tuPerfilVocacional")}
                   </p>
 
                   {/* Círculo principal */}
@@ -890,7 +892,7 @@ export default function PerfilPage() {
                     <div className="text-center">
                       <p className="text-sm font-bold text-slate-900">{top.title}</p>
                       <p className="mt-0.5 text-xs text-slate-500">
-                        Basado en {top.count} test{top.count !== 1 ? "s" : ""}
+                        {t(top.count !== 1 ? "perfil.basadoEnTests" : "perfil.basadoEnTest", { count: top.count })}
                       </p>
                     </div>
                   </div>
@@ -899,7 +901,7 @@ export default function PerfilPage() {
                   {second && (
                     <div className="mt-5 border-t border-slate-100 pt-4">
                       <p className="mb-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        Segunda opción
+                        {t("perfil.segundaOpcion")}
                       </p>
                       <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-3">
                         <div
@@ -930,14 +932,14 @@ export default function PerfilPage() {
                             <p className="text-sm font-bold text-slate-900">
                               {second.emoji} {second.title}
                             </p>
-                            <p className="text-xs text-slate-500">Segunda carrera más apta</p>
+                            <p className="text-xs text-slate-500">{t("perfil.segundaCarreraApta")}</p>
                           </div>
                         </div>
                         {/* Overlay con indicación */}
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 shadow-sm">
                             <span className="text-xs">🔍</span>
-                            <span className="text-xs font-semibold text-slate-600">Haz más tests para revelar</span>
+                            <span className="text-xs font-semibold text-slate-600">{t("perfil.hazMasTests")}</span>
                           </div>
                         </div>
                       </div>
@@ -949,21 +951,21 @@ export default function PerfilPage() {
 
             <div className="space-y-3 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-600">
-                Acciones
+                {t("perfil.acciones")}
               </p>
               <ul className="space-y-3 text-slate-700">
-                <li>• Accede al menú de admisión para encontrar requisitos.</li>
-                <li>• Ve tus recursos y carreras recomendadas.</li>
-                <li>• Cierra sesión si usas un equipo compartido.</li>
+                <li>{t("perfil.accion1")}</li>
+                <li>{t("perfil.accion2")}</li>
+                <li>{t("perfil.accion3")}</li>
               </ul>
             </div>
 
             <div className="space-y-3 rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 p-6">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">
-                Próximamente
+                {t("perfil.proximamente")}
               </p>
               <p className="text-sm leading-6 text-slate-600">
-                Edición de datos del perfil, foto de cuenta y notificaciones sobre tu proceso de admisión.
+                {t("perfil.proximamenteDesc")}
               </p>
             </div>
 
@@ -971,7 +973,7 @@ export default function PerfilPage() {
             <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
-                  Badges y Logros
+                  {t("perfil.badgesLogros")}
                 </p>
                 {totalXp > 0 && (
                   <div className="flex items-center gap-1.5 rounded-xl bg-amber-50 px-2.5 py-1">

@@ -1,12 +1,14 @@
 ﻿"use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { login, register } from "../../src/services/authService";
 import { hasAvatar } from "../../src/services/avatarService";
 import { useRouter } from "next/navigation";
 
 function SuccessModal({ message, onContinue }: { message: string; onContinue: () => void }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -26,13 +28,13 @@ function SuccessModal({ message, onContinue }: { message: string; onContinue: ()
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="text-lg font-bold text-slate-900 text-center">¡Éxito!</h3>
+        <h3 className="text-lg font-bold text-slate-900 text-center">{t("login.exito")}</h3>
         <p className="mt-2 text-sm text-slate-500 text-center">{message}</p>
         <button
           onClick={onContinue}
           className="mt-6 w-full rounded-xl bg-gradient-to-br from-red-500 to-rose-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-red-500/25 transition hover:shadow-xl"
         >
-          Continuar
+          {t("login.continuar")}
         </button>
       </motion.div>
     </motion.div>
@@ -40,6 +42,7 @@ function SuccessModal({ message, onContinue }: { message: string; onContinue: ()
 }
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
@@ -56,17 +59,17 @@ export default function LoginPage() {
     setError("");
 
     if (!name.trim()) {
-      setError("Ingresa tu nombre");
+      setError(t("login.ingresaNombre"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError(t("login.contrasenasNoCoinciden"));
       return;
     }
 
     if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres");
+      setError(t("login.contrasenaMinima"));
       return;
     }
 
@@ -74,7 +77,7 @@ export default function LoginPage() {
     try {
       const result = await register(email, password, name);
       document.cookie = `vocatio_session=${result.user.uid}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-      setSuccessMessage("Usuario registrado correctamente");
+      setSuccessMessage(t("login.usuarioRegistrado"));
       setShowSuccess(true);
       router.push("/avatar-setup");
     } catch (error: any) {
@@ -91,7 +94,7 @@ export default function LoginPage() {
       const result = await login(email, password);
       document.cookie = `vocatio_session=${result.user.uid}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
       const avatarExists = await hasAvatar(result.user.uid);
-      setSuccessMessage("Inicio de sesión exitoso");
+      setSuccessMessage(t("login.sesionExitosa"));
       setShowSuccess(true);
       router.push(avatarExists ? "/" : "/avatar-setup");
     } catch (error: any) {
@@ -123,10 +126,10 @@ export default function LoginPage() {
                 Vocatio AI
               </div>
               <h1 className="text-4xl font-extrabold tracking-[-0.04em] text-slate-950 sm:text-5xl">
-                Bienvenido al hub vocacional más dinámico
+                {t("login.bienvenido")}
               </h1>
               <p className="max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
-                Un inicio de sesión moderno con los tonos y la energía del sistema. Aquí comienza tu camino hacia la UTP con mentoría, recursos y admisión.
+                {t("login.descripcionLogin")}
               </p>
             </div>
 
@@ -154,11 +157,11 @@ export default function LoginPage() {
                 exit={{ opacity: 0, height: 0 }}
               >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nombre
+                  {t("login.nombre")}
                 </label>
                 <input
                   type="text"
-                  placeholder="Tu nombre"
+                  placeholder={t("login.tuNombre")}
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError(""); }}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-700 mb-2"
@@ -169,7 +172,7 @@ export default function LoginPage() {
             {/* Campo Correo */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Correo electrónico
+                {t("login.correoElectronico")}
               </label>
               <input
                 type="email"
@@ -183,7 +186,7 @@ export default function LoginPage() {
             {/* Campo Contraseña */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña
+                {t("login.contraseña")}
               </label>
               <input
                 type="password"
@@ -201,7 +204,7 @@ export default function LoginPage() {
                 animate={{ opacity: 1, y: 0 }}
               >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirmar contraseña
+                  {t("login.confirmarContraseña")}
                 </label>
                 <input
                   type="password"
@@ -244,10 +247,10 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  {isLogin ? "Iniciando..." : "Creando cuenta..."}
+                  {isLogin ? t("login.iniciando") : t("login.creandoCuenta")}
                 </>
               ) : (
-                isLogin ? "Iniciar Sesión" : "Crear Cuenta"
+                isLogin ? t("login.iniciarSesion") : t("login.crearCuenta")
               )}
             </motion.button>
 
@@ -255,24 +258,24 @@ export default function LoginPage() {
             <div className="text-center mt-2">
               {isLogin ? (
                 <>
-                  <span className="text-gray-500">¿No tienes cuenta?</span>
+                  <span className="text-gray-500">{t("login.noTienesCuenta")}</span>
                   <button
                     type="button"
                     onClick={() => { setIsLogin(false); setError(""); }}
                     className="ml-2 text-red-700 font-semibold hover:underline"
                   >
-                    Registrarse
+                    {t("login.registrarse")}
                   </button>
                 </>
               ) : (
                 <>
-                  <span className="text-gray-500">¿Ya tienes cuenta?</span>
+                  <span className="text-gray-500">{t("login.yaTienesCuenta")}</span>
                   <button
                     type="button"
                     onClick={() => { setIsLogin(true); setError(""); }}
                     className="ml-2 text-red-700 font-semibold hover:underline"
                   >
-                    Iniciar sesión
+                    {t("login.iniciarSesionLink")}
                   </button>
                 </>
               )}

@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { useTranslation } from "@/lib/i18n";
 
 // Stable star data for astronauta card
 const ASTRO_STARS = Array.from({ length: 40 }, (_, i) => ({
@@ -31,189 +32,191 @@ type CareerCard = {
   svgType?: "ecg" | "grid" | "matrix" | "flame";
 };
 
-const CAREER_CARDS: CareerCard[] = [
-  {
-    id: "astronauta",
-    href: "/simular/astronauta",
-    emoji: "🚀",
-    title: "Astronauta",
-    tagline: "Misión Apolo X — lanza, esquiva asteroides y aterriza en la Luna",
-    color: "#fbbf24",
-    gradient: "linear-gradient(135deg,#dc2626,#f97316)",
-    bg: "radial-gradient(ellipse at 30% 30%, #0f0c29 0%, #000510 100%)",
-    border: "rgba(255,255,255,0.18)",
-    badge: "🌟 Exclusivo",
-    features: ["🚀 Lanzamiento", "☄️ Asteroides", "🌕 Aterrizaje", "🧑‍🚀 Paseo Lunar"],
-    decos: [],
-  },
-  {
-    id: "medicina",
-    href: "/simular/medicina",
-    emoji: "🏥",
-    title: "Medicina",
-    tagline: "Diagnóstica, desfibrilas y opera. ¿Tienes lo que se necesita?",
-    color: "#bae6fd",
-    gradient: "linear-gradient(135deg,#0284c7,#38bdf8)",
-    bg: "linear-gradient(145deg, #0369a1 0%, #0ea5e9 55%, #38bdf8 100%)",
-    border: "rgba(186,230,253,0.45)",
-    badge: "🎮 Juego real",
-    features: [],
-    decos: [
-      { t: "❤️", x: 75, y: 10, s: 1.8, o: 0.28 },
-      { t: "🩺", x: 7, y: 68, s: 1.4, o: 0.25 },
-      { t: "💊", x: 79, y: 64, s: 1.2, o: 0.22 },
-      { t: "+", x: 60, y: 40, s: 3.2, o: 0.12, color: "#fff" },
-      { t: "+", x: 18, y: 20, s: 2.0, o: 0.1, color: "#fff" },
-      { t: "🏥", x: 54, y: 83, s: 1.3, o: 0.22 },
-    ],
-    svgType: "ecg",
-  },
-  {
-    id: "derecho",
-    href: "/simular/derecho",
-    emoji: "⚖️",
-    title: "Derecho",
-    tagline: "Evalúa evidencias, objeta testimonios y gana el caso.",
-    color: "#fef3c7",
-    gradient: "linear-gradient(135deg,#92400e,#fbbf24)",
-    bg: "linear-gradient(145deg, #78350f 0%, #b45309 55%, #d97706 100%)",
-    border: "rgba(254,243,199,0.4)",
-    badge: "🎮 Juego real",
-    features: [],
-    decos: [
-      { t: "⚖️", x: 70, y: 9, s: 1.9, o: 0.28 },
-      { t: "📜", x: 7, y: 66, s: 1.4, o: 0.25 },
-      { t: "🏛️", x: 75, y: 66, s: 1.6, o: 0.24 },
-      { t: "🔨", x: 52, y: 48, s: 1.5, o: 0.18 },
-      { t: "📖", x: 18, y: 14, s: 1.2, o: 0.22 },
-    ],
-  },
-  {
-    id: "arquitectura",
-    href: "/simular/arquitectura",
-    emoji: "🏛️",
-    title: "Arquitectura",
-    tagline: "Diseña planos, balancea estructuras y presenta al cliente.",
-    color: "#dbeafe",
-    gradient: "linear-gradient(135deg,#1d4ed8,#60a5fa)",
-    bg: "linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 55%, #3b82f6 100%)",
-    border: "rgba(219,234,254,0.4)",
-    badge: "🎮 Juego real",
-    features: [],
-    decos: [
-      { t: "📐", x: 70, y: 9, s: 1.7, o: 0.28 },
-      { t: "📏", x: 7, y: 63, s: 1.4, o: 0.25 },
-      { t: "🏗️", x: 73, y: 66, s: 1.6, o: 0.25 },
-      { t: "🔲", x: 50, y: 80, s: 1.3, o: 0.18 },
-    ],
-    svgType: "grid",
-  },
-  {
-    id: "gastronomia",
-    href: "/simular/gastronomia",
-    emoji: "👨‍🍳",
-    title: "Gastronomía",
-    tagline: "Prepara mise en place, controla temperatura y emplata con arte.",
-    color: "#ffedd5",
-    gradient: "linear-gradient(135deg,#c2410c,#f97316)",
-    bg: "linear-gradient(145deg, #7c2d12 0%, #c2410c 55%, #ea580c 100%)",
-    border: "rgba(255,237,213,0.4)",
-    badge: "🎮 Juego real",
-    features: [],
-    decos: [
-      { t: "🔥", x: 67, y: 7, s: 2.0, o: 0.32 },
-      { t: "🍳", x: 7, y: 60, s: 1.6, o: 0.28 },
-      { t: "🌶️", x: 76, y: 63, s: 1.3, o: 0.28 },
-      { t: "✨", x: 40, y: 80, s: 1.1, o: 0.22 },
-      { t: "🔥", x: 26, y: 86, s: 1.4, o: 0.22 },
-      { t: "🧂", x: 57, y: 43, s: 1.1, o: 0.2 },
-    ],
-    svgType: "flame",
-  },
-  {
-    id: "ingenieria-civil",
-    href: "/simular/ingenieria-civil",
-    emoji: "🏗️",
-    title: "Ing. Civil",
-    tagline: "Mezcla concreto, calcula cargas e inspecciona la obra.",
-    color: "#fde68a",
-    gradient: "linear-gradient(135deg,#92400e,#d97706)",
-    bg: "linear-gradient(145deg, #451a03 0%, #92400e 55%, #b45309 100%)",
-    border: "rgba(253,230,138,0.4)",
-    badge: "🎮 Juego real",
-    features: [],
-    decos: [
-      { t: "⚙️", x: 70, y: 9, s: 1.7, o: 0.28 },
-      { t: "🔩", x: 7, y: 63, s: 1.5, o: 0.28 },
-      { t: "🦺", x: 74, y: 66, s: 1.5, o: 0.25 },
-      { t: "🔨", x: 52, y: 80, s: 1.4, o: 0.22 },
-      { t: "📐", x: 20, y: 16, s: 1.2, o: 0.22 },
-    ],
-  },
-  {
-    id: "software",
-    href: "/simular/software",
-    emoji: "💻",
-    title: "Software",
-    tagline: "Debuggea código, optimiza algoritmos y asegura el deploy.",
-    color: "#bbf7d0",
-    gradient: "linear-gradient(135deg,#166534,#4ade80)",
-    bg: "linear-gradient(145deg, #052e16 0%, #14532d 55%, #166534 100%)",
-    border: "rgba(187,247,208,0.4)",
-    badge: "🎮 Juego real",
-    features: [],
-    decos: [
-      { t: "</>", x: 65, y: 7, s: 0.78, o: 0.35, color: "#86efac" },
-      { t: "{ }", x: 7, y: 16, s: 0.8, o: 0.3, color: "#86efac" },
-      { t: "const", x: 55, y: 53, s: 0.64, o: 0.28, color: "#86efac" },
-      { t: "fn()", x: 9, y: 70, s: 0.7, o: 0.28, color: "#86efac" },
-      { t: "01010", x: 62, y: 78, s: 0.58, o: 0.24, color: "#86efac" },
-      { t: "=>", x: 37, y: 84, s: 0.74, o: 0.28, color: "#86efac" },
-      { t: "//", x: 49, y: 28, s: 0.74, o: 0.28, color: "#86efac" },
-    ],
-    svgType: "matrix",
-  },
-  {
-    id: "psicologia",
-    href: "/simular/psicologia",
-    emoji: "🧠",
-    title: "Psicología",
-    tagline: "Identifica emociones, aplica terapias y gestiona crisis.",
-    color: "#ede9fe",
-    gradient: "linear-gradient(135deg,#6d28d9,#c4b5fd)",
-    bg: "linear-gradient(145deg, #2e1065 0%, #4c1d95 55%, #6d28d9 100%)",
-    border: "rgba(237,233,254,0.4)",
-    badge: "🎮 Juego real",
-    features: [],
-    decos: [
-      { t: "🧠", x: 70, y: 9, s: 1.7, o: 0.28 },
-      { t: "💭", x: 7, y: 58, s: 1.5, o: 0.25 },
-      { t: "✨", x: 77, y: 63, s: 1.3, o: 0.3 },
-      { t: "🌿", x: 52, y: 80, s: 1.3, o: 0.25 },
-      { t: "💫", x: 21, y: 18, s: 1.1, o: 0.22 },
-    ],
-  },
-  {
-    id: "marketing",
-    href: "/simular/marketing",
-    emoji: "📣",
-    title: "Marketing",
-    tagline: "Segmenta audiencias, elige el mejor copy y mide tu ROI.",
-    color: "#fce7f3",
-    gradient: "linear-gradient(135deg,#9d174d,#f472b6)",
-    bg: "linear-gradient(145deg, #4a044e 0%, #831843 55%, #be185d 100%)",
-    border: "rgba(252,231,243,0.4)",
-    badge: "🎮 Juego real",
-    features: [],
-    decos: [
-      { t: "📱", x: 70, y: 7, s: 1.6, o: 0.28 },
-      { t: "📊", x: 7, y: 63, s: 1.6, o: 0.28 },
-      { t: "⭐", x: 77, y: 63, s: 1.3, o: 0.3 },
-      { t: "🎯", x: 52, y: 80, s: 1.4, o: 0.25 },
-      { t: "💎", x: 21, y: 16, s: 1.1, o: 0.24 },
-    ],
-  },
-];
+function getCareerCards(t: (key: string) => string): CareerCard[] {
+  return [
+    {
+      id: "astronauta",
+      href: "/simular/astronauta",
+      emoji: "🚀",
+      title: t("simular.astronautaTitle"),
+      tagline: t("simular.astronautaTagline"),
+      color: "#fbbf24",
+      gradient: "linear-gradient(135deg,#dc2626,#f97316)",
+      bg: "radial-gradient(ellipse at 30% 30%, #0f0c29 0%, #000510 100%)",
+      border: "rgba(255,255,255,0.18)",
+      badge: t("simular.astronautaExclusivo"),
+      features: [t("simular.astronautaLanzamiento"), t("simular.astronautaAsteroides"), t("simular.astronautaAterrizaje"), t("simular.astronautaPaseoLunar")],
+      decos: [],
+    },
+    {
+      id: "medicina",
+      href: "/simular/medicina",
+      emoji: "🏥",
+      title: t("simular.medicinaTitle"),
+      tagline: t("simular.medicinaTagline"),
+      color: "#bae6fd",
+      gradient: "linear-gradient(135deg,#0284c7,#38bdf8)",
+      bg: "linear-gradient(145deg, #0369a1 0%, #0ea5e9 55%, #38bdf8 100%)",
+      border: "rgba(186,230,253,0.45)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "❤️", x: 75, y: 10, s: 1.8, o: 0.28 },
+        { t: "🩺", x: 7, y: 68, s: 1.4, o: 0.25 },
+        { t: "💊", x: 79, y: 64, s: 1.2, o: 0.22 },
+        { t: "+", x: 60, y: 40, s: 3.2, o: 0.12, color: "#fff" },
+        { t: "+", x: 18, y: 20, s: 2.0, o: 0.1, color: "#fff" },
+        { t: "🏥", x: 54, y: 83, s: 1.3, o: 0.22 },
+      ],
+      svgType: "ecg",
+    },
+    {
+      id: "derecho",
+      href: "/simular/derecho",
+      emoji: "⚖️",
+      title: t("simular.derechoTitle"),
+      tagline: t("simular.derechoTagline"),
+      color: "#fef3c7",
+      gradient: "linear-gradient(135deg,#92400e,#fbbf24)",
+      bg: "linear-gradient(145deg, #78350f 0%, #b45309 55%, #d97706 100%)",
+      border: "rgba(254,243,199,0.4)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "⚖️", x: 70, y: 9, s: 1.9, o: 0.28 },
+        { t: "📜", x: 7, y: 66, s: 1.4, o: 0.25 },
+        { t: "🏛️", x: 75, y: 66, s: 1.6, o: 0.24 },
+        { t: "🔨", x: 52, y: 48, s: 1.5, o: 0.18 },
+        { t: "📖", x: 18, y: 14, s: 1.2, o: 0.22 },
+      ],
+    },
+    {
+      id: "arquitectura",
+      href: "/simular/arquitectura",
+      emoji: "🏛️",
+      title: t("simular.arquitecturaTitle"),
+      tagline: t("simular.arquitecturaTagline"),
+      color: "#dbeafe",
+      gradient: "linear-gradient(135deg,#1d4ed8,#60a5fa)",
+      bg: "linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 55%, #3b82f6 100%)",
+      border: "rgba(219,234,254,0.4)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "📐", x: 70, y: 9, s: 1.7, o: 0.28 },
+        { t: "📏", x: 7, y: 63, s: 1.4, o: 0.25 },
+        { t: "🏗️", x: 73, y: 66, s: 1.6, o: 0.25 },
+        { t: "🔲", x: 50, y: 80, s: 1.3, o: 0.18 },
+      ],
+      svgType: "grid",
+    },
+    {
+      id: "gastronomia",
+      href: "/simular/gastronomia",
+      emoji: "👨‍🍳",
+      title: t("simular.gastronomiaTitle"),
+      tagline: t("simular.gastronomiaTagline"),
+      color: "#ffedd5",
+      gradient: "linear-gradient(135deg,#c2410c,#f97316)",
+      bg: "linear-gradient(145deg, #7c2d12 0%, #c2410c 55%, #ea580c 100%)",
+      border: "rgba(255,237,213,0.4)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "🔥", x: 67, y: 7, s: 2.0, o: 0.32 },
+        { t: "🍳", x: 7, y: 60, s: 1.6, o: 0.28 },
+        { t: "🌶️", x: 76, y: 63, s: 1.3, o: 0.28 },
+        { t: "✨", x: 40, y: 80, s: 1.1, o: 0.22 },
+        { t: "🔥", x: 26, y: 86, s: 1.4, o: 0.22 },
+        { t: "🧂", x: 57, y: 43, s: 1.1, o: 0.2 },
+      ],
+      svgType: "flame",
+    },
+    {
+      id: "ingenieria-civil",
+      href: "/simular/ingenieria-civil",
+      emoji: "🏗️",
+      title: t("simular.ingenieriaCivilTitle"),
+      tagline: t("simular.ingenieriaCivilTagline"),
+      color: "#fde68a",
+      gradient: "linear-gradient(135deg,#92400e,#d97706)",
+      bg: "linear-gradient(145deg, #451a03 0%, #92400e 55%, #b45309 100%)",
+      border: "rgba(253,230,138,0.4)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "⚙️", x: 70, y: 9, s: 1.7, o: 0.28 },
+        { t: "🔩", x: 7, y: 63, s: 1.5, o: 0.28 },
+        { t: "🦺", x: 74, y: 66, s: 1.5, o: 0.25 },
+        { t: "🔨", x: 52, y: 80, s: 1.4, o: 0.22 },
+        { t: "📐", x: 20, y: 16, s: 1.2, o: 0.22 },
+      ],
+    },
+    {
+      id: "software",
+      href: "/simular/software",
+      emoji: "💻",
+      title: t("simular.softwareTitle"),
+      tagline: t("simular.softwareTagline"),
+      color: "#bbf7d0",
+      gradient: "linear-gradient(135deg,#166534,#4ade80)",
+      bg: "linear-gradient(145deg, #052e16 0%, #14532d 55%, #166534 100%)",
+      border: "rgba(187,247,208,0.4)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "</>", x: 65, y: 7, s: 0.78, o: 0.35, color: "#86efac" },
+        { t: "{ }", x: 7, y: 16, s: 0.8, o: 0.3, color: "#86efac" },
+        { t: "const", x: 55, y: 53, s: 0.64, o: 0.28, color: "#86efac" },
+        { t: "fn()", x: 9, y: 70, s: 0.7, o: 0.28, color: "#86efac" },
+        { t: "01010", x: 62, y: 78, s: 0.58, o: 0.24, color: "#86efac" },
+        { t: "=>", x: 37, y: 84, s: 0.74, o: 0.28, color: "#86efac" },
+        { t: "//", x: 49, y: 28, s: 0.74, o: 0.28, color: "#86efac" },
+      ],
+      svgType: "matrix",
+    },
+    {
+      id: "psicologia",
+      href: "/simular/psicologia",
+      emoji: "🧠",
+      title: t("simular.psicologiaTitle"),
+      tagline: t("simular.psicologiaTagline"),
+      color: "#ede9fe",
+      gradient: "linear-gradient(135deg,#6d28d9,#c4b5fd)",
+      bg: "linear-gradient(145deg, #2e1065 0%, #4c1d95 55%, #6d28d9 100%)",
+      border: "rgba(237,233,254,0.4)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "🧠", x: 70, y: 9, s: 1.7, o: 0.28 },
+        { t: "💭", x: 7, y: 58, s: 1.5, o: 0.25 },
+        { t: "✨", x: 77, y: 63, s: 1.3, o: 0.3 },
+        { t: "🌿", x: 52, y: 80, s: 1.3, o: 0.25 },
+        { t: "💫", x: 21, y: 18, s: 1.1, o: 0.22 },
+      ],
+    },
+    {
+      id: "marketing",
+      href: "/simular/marketing",
+      emoji: "📣",
+      title: t("simular.marketingTitle"),
+      tagline: t("simular.marketingTagline"),
+      color: "#fce7f3",
+      gradient: "linear-gradient(135deg,#9d174d,#f472b6)",
+      bg: "linear-gradient(145deg, #4a044e 0%, #831843 55%, #be185d 100%)",
+      border: "rgba(252,231,243,0.4)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "📱", x: 70, y: 7, s: 1.6, o: 0.28 },
+        { t: "📊", x: 7, y: 63, s: 1.6, o: 0.28 },
+        { t: "⭐", x: 77, y: 63, s: 1.3, o: 0.3 },
+        { t: "🎯", x: 52, y: 80, s: 1.4, o: 0.25 },
+        { t: "💎", x: 21, y: 16, s: 1.1, o: 0.24 },
+      ],
+    },
+  ];
+}
 
 // ─── SVG decoration layers ────────────────────────────────────
 
@@ -283,10 +286,10 @@ function FlameLayer() {
 const CARD_W = 272;
 const CARD_GAP = 16;
 
-function Carousel() {
+function Carousel({ cards, t }: { cards: CareerCard[]; t: (key: string, params?: Record<string, string | number>) => string }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
-  const total = CAREER_CARDS.length;
+  const total = cards.length;
   const canPrev = idx > 0;
   const canNext = idx < total - 1;
 
@@ -346,7 +349,7 @@ function Carousel() {
           WebkitOverflowScrolling: "touch",
         }}
       >
-        {CAREER_CARDS.map((card, i) => (
+        {cards.map((card, i) => (
           <motion.a
             key={card.id}
             href={card.href}
@@ -417,7 +420,7 @@ function Carousel() {
                 </span>
                 {card.id === "astronauta" && (
                   <span className="rounded-full px-2 py-1 text-[10px] font-bold text-white/70 border border-white/20">
-                    Modo experimental
+                    {t("simular.modoExperimental")}
                   </span>
                 )}
               </div>
@@ -455,7 +458,7 @@ function Carousel() {
 
               {/* CTA */}
               <div className="flex items-center gap-1.5 text-xs font-bold mt-auto text-white/80">
-                <span>Jugar ahora</span>
+                <span>{t("simular.jugarAhora")}</span>
                 <motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
               </div>
             </div>
@@ -468,7 +471,7 @@ function Carousel() {
 
       {/* Dot indicators */}
       <div className="flex justify-center gap-1.5 mt-3 pb-2">
-        {CAREER_CARDS.map((_, i) => (
+        {cards.map((_, i) => (
           <button
             key={i}
             onClick={() => go(i - idx)}
@@ -487,6 +490,9 @@ function Carousel() {
 
 // ─── Page root ────────────────────────────────────────────────
 export default function SimularPage() {
+  const { t } = useTranslation();
+  const careerCards = getCareerCards(t);
+
   return (
     <main
       className="min-h-screen"
@@ -504,7 +510,7 @@ export default function SimularPage() {
           animate={{ opacity: 1, y: 0 }}
           className="inline-block rounded-full bg-gradient-to-r from-red-600 to-rose-500 px-4 py-1.5 text-xs font-bold text-white mb-3"
         >
-          🎮 {CAREER_CARDS.length} carreras — Juego real
+          {t("simular.carrerasJuegoReal", { count: careerCards.length })}
         </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
@@ -512,7 +518,7 @@ export default function SimularPage() {
           transition={{ delay: 0.1 }}
           className="text-3xl sm:text-4xl font-black text-slate-900 mb-3"
         >
-          Vive la carrera antes de elegirla
+          {t("simular.viveCarrera")}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
@@ -520,7 +526,7 @@ export default function SimularPage() {
           transition={{ delay: 0.2 }}
           className="text-slate-500 text-sm sm:text-base"
         >
-          No encuestas — juegos reales. Toma decisiones como un profesional y descubre tu aptitud del 0% al 100%.
+          {t("simular.noEncuestas")}
         </motion.p>
       </div>
 
@@ -531,12 +537,12 @@ export default function SimularPage() {
         transition={{ delay: 0.25 }}
         className="max-w-5xl mx-auto"
       >
-        <Carousel />
+        <Carousel cards={careerCards} t={t} />
       </motion.div>
 
       {/* Bottom hint */}
       <p className="text-center text-slate-400 text-xs pb-8 mt-2">
-        ← Desliza para ver todas las carreras →
+        {t("simular.deslizaCarreras")}
       </p>
     </main>
   );

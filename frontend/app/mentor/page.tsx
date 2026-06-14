@@ -19,6 +19,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { auth, db } from "../../src/firebase/config";
+import { useTranslation } from "@/lib/i18n";
 
 type Message = {
   role: "user" | "assistant";
@@ -74,6 +75,7 @@ function getCareerInfo(id: string): Career | undefined {
 }
 
 function TypingIndicator() {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-1 px-4 py-3">
       <div className="flex gap-1">
@@ -91,7 +93,7 @@ function TypingIndicator() {
           />
         ))}
       </div>
-      <span className="ml-2 text-xs text-slate-400">Escribiendo...</span>
+      <span className="ml-2 text-xs text-slate-400">{t("mentor.escribiendo")}</span>
     </div>
   );
 }
@@ -105,6 +107,7 @@ function ConnectionError({
   onRetry: () => void;
   careerColor: string;
 }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -151,13 +154,13 @@ function ConnectionError({
 
           {/* Title */}
           <h3 className="text-sm font-bold text-slate-900">
-            No se pudo conectar con el mentor
+            {t("mentor.noSePudoConectar")}
           </h3>
 
           {/* Description */}
           <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
             {message ||
-              "Verifica que el backend esté corriendo e intenta de nuevo."}
+              t("mentor.verificaBackend")}
           </p>
 
           {/* Retry button */}
@@ -184,7 +187,7 @@ function ConnectionError({
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
               />
             </svg>
-            Reintentar
+            {t("mentor.reintentar")}
           </motion.button>
         </div>
       </div>
@@ -199,6 +202,7 @@ function MessageBubble({
   message: Message;
   mentorName: string;
 }) {
+  const { t } = useTranslation();
   const isUser = message.role === "user";
 
   return (
@@ -227,7 +231,7 @@ function MessageBubble({
         </div>
         {isUser && (
           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
-            TÚ
+            {t("mentor.tu")}
           </div>
         )}
       </div>
@@ -242,6 +246,7 @@ function ClearChatModal({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -272,24 +277,23 @@ function ClearChatModal({
           </svg>
         </div>
         <h3 className="text-lg font-bold text-slate-900 text-center">
-          Limpiar conversación
+          {t("mentor.limpiarConversacion")}
         </h3>
         <p className="mt-2 text-sm text-slate-500 text-center">
-          Se eliminará todo el historial de esta conversación. Esta acción no se
-          puede deshacer.
+          {t("mentor.confirmarLimpiar")}
         </p>
         <div className="mt-6 flex gap-3">
           <button
             onClick={onCancel}
             className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           >
-            Cancelar
+            {t("common.cancelar")}
           </button>
           <button
             onClick={onConfirm}
             className="flex-1 rounded-xl bg-gradient-to-br from-red-500 to-rose-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-red-500/25 transition hover:shadow-xl"
           >
-            Limpiar
+            {t("common.limpiar")}
           </button>
         </div>
       </motion.div>
@@ -298,6 +302,7 @@ function ClearChatModal({
 }
 
 function CareerSelector({ onSelect }: { onSelect: (id: string) => void }) {
+  const { t } = useTranslation();
   const selectedCareer = (id: string) => {
     onSelect(id);
   };
@@ -327,14 +332,13 @@ function CareerSelector({ onSelect }: { onSelect: (id: string) => void }) {
             🤖
           </motion.div>
           <h2 className="text-3xl font-black text-slate-950 sm:text-4xl">
-            Tu Mentor de{" "}
+            {t("mentor.tuMentorDe")}{" "}
             <span className="bg-gradient-to-r from-red-600 via-rose-600 to-orange-500 bg-clip-text text-transparent">
-              Entrevistas
+              {t("mentor.entrevistas")}
             </span>
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-slate-500">
-            Practica entrevistas reales con un mentor IA que se adapta a tu
-            carrera. Recibe feedback personalizado y mejora tu confianza.
+            {t("mentor.descripcionMentor")}
           </p>
         </motion.div>
 
@@ -373,7 +377,7 @@ function CareerSelector({ onSelect }: { onSelect: (id: string) => void }) {
                     {mentorCareer.tagline}
                   </p>
                   <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-red-600 opacity-0 transition-opacity group-hover:opacity-100">
-                    Empezar entrevista
+                    {t("mentor.empezarEntrevista")}
                     <span className="transition-transform group-hover:translate-x-1">
                       →
                     </span>
@@ -394,18 +398,18 @@ function CareerSelector({ onSelect }: { onSelect: (id: string) => void }) {
           {[
             {
               icon: "🎯",
-              title: "Feedback real",
-              desc: "Recibe evaluación detallada de cada respuesta",
+              title: t("mentor.feedbackReal"),
+              desc: t("mentor.feedbackRealDesc"),
             },
             {
               icon: "🧠",
-              title: "Preguntas reales",
-              desc: "Basadas en entrevistas reales de empresas y universidades",
+              title: t("mentor.preguntasReales"),
+              desc: t("mentor.preguntasRealesDesc"),
             },
             {
               icon: "📈",
-              title: "Mejora continua",
-              desc: "Practica tantas veces como quieras sin presión",
+              title: t("mentor.mejoraContinua"),
+              desc: t("mentor.mejoraContinuaDesc"),
             },
           ].map((item) => (
             <div
@@ -426,6 +430,7 @@ function CareerSelector({ onSelect }: { onSelect: (id: string) => void }) {
 }
 
 export default function MentorPage() {
+  const { t } = useTranslation();
   const [selectedCareerId, setSelectedCareerId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -612,7 +617,7 @@ export default function MentorPage() {
         if (!res.ok) {
           setIsConnected(false);
           throw new Error(
-            "El servidor respondió con un error. Verifica que el backend esté activo.",
+            t("mentor.errorServidor"),
           );
         }
 
@@ -652,7 +657,7 @@ export default function MentorPage() {
         }
 
         if (!assistantContent) {
-          throw new Error("El mentor no devolvió una respuesta válida.");
+          throw new Error(t("mentor.respuestaInvalida"));
         }
 
         speak(assistantContent);
@@ -667,14 +672,14 @@ export default function MentorPage() {
         const errorMsg =
           error instanceof Error
             ? error.message
-            : "Error desconocido al conectar con el mentor.";
+            : t("mentor.errorDesconocido");
         setConnectionError(errorMsg);
         setMessages([]);
       } finally {
         setIsLoading(false);
       }
     },
-    [loadChatHistory, saveChatHistory, speak],
+    [loadChatHistory, saveChatHistory, speak, t],
   );
 
   const sendMessage = useCallback(async () => {
@@ -700,7 +705,7 @@ export default function MentorPage() {
 
       if (!res.ok) {
         setIsConnected(false);
-        throw new Error("El servidor respondió con un error.");
+        throw new Error(t("mentor.errorServidorSimple"));
       }
 
       setIsConnected(true);
@@ -738,7 +743,7 @@ export default function MentorPage() {
       }
 
       if (!assistantContent) {
-        throw new Error("El mentor no devolvió una respuesta válida.");
+        throw new Error(t("mentor.respuestaInvalida"));
       }
 
       speak(assistantContent);
@@ -764,13 +769,13 @@ export default function MentorPage() {
       const errorMsg =
         error instanceof Error
           ? error.message
-          : "Error desconocido al conectar con el mentor.";
+          : t("mentor.errorDesconocido");
       setConnectionError(errorMsg);
       await saveChatHistory(selectedCareerId, newMessages);
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, selectedCareerId, saveChatHistory, speak]);
+  }, [input, isLoading, messages, selectedCareerId, saveChatHistory, speak, t]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -825,7 +830,7 @@ export default function MentorPage() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-slate-900">
-                {mentorInfo?.name || "Mentor IA"}
+                {mentorInfo?.name || t("mentor.mentoriaIA")}
               </h1>
               <p className="text-xs text-slate-500">
                 {mentorInfo?.title || careerInfo?.title || ""}
@@ -837,7 +842,7 @@ export default function MentorPage() {
             {/* Botón mute/unmute TTS */}
             <button
               onClick={() => setIsMuted((m) => !m)}
-              title={isMuted ? "Activar voz del mentor" : "Silenciar voz del mentor"}
+              title={isMuted ? t("mentor.habilitarVoz") : t("mentor.deshabilitarVoz")}
               className={`flex h-8 w-8 items-center justify-center rounded-lg border text-sm transition ${
                 isMuted
                   ? "border-slate-200 bg-white text-slate-400 hover:text-slate-600"
@@ -864,13 +869,13 @@ export default function MentorPage() {
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                 />
               </svg>
-              Limpiar
+              {t("mentor.limpiarChat")}
             </button>
             {isConnected === true && (
               <div className="flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1">
                 <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
                 <span className="text-[10px] font-medium text-green-700">
-                  En línea
+                  {t("mentor.enLinea")}
                 </span>
               </div>
             )}
@@ -878,7 +883,7 @@ export default function MentorPage() {
               <div className="flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1">
                 <div className="h-1.5 w-1.5 rounded-full bg-red-400" />
                 <span className="text-[10px] font-medium text-red-600">
-                  Desconectado
+                  {t("mentor.desconectado")}
                 </span>
               </div>
             )}
@@ -886,7 +891,7 @@ export default function MentorPage() {
               <div className="flex items-center gap-1.5 rounded-full bg-slate-50 px-3 py-1">
                 <div className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-pulse" />
                 <span className="text-[10px] font-medium text-slate-500">
-                  Conectando...
+                  {t("mentor.conectando")}
                 </span>
               </div>
             )}
@@ -913,11 +918,10 @@ export default function MentorPage() {
                 {careerInfo?.emoji || "🤖"}
               </div>
               <h2 className="text-lg font-bold text-slate-900">
-                Entrevista de {careerInfo?.title || selectedCareerId}
+                {t("mentor.entrevistaDe")} {careerInfo?.title || selectedCareerId}
               </h2>
               <p className="mt-1 max-w-sm text-sm text-slate-500">
-                Tu mentor te dará la bienvenida. Responde con naturalidad como
-                si fuera una entrevista real.
+                {t("mentor.tuMentorTeDara")}
               </p>
             </motion.div>
           )}
@@ -973,7 +977,7 @@ export default function MentorPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={isListening ? "🎙️ Escuchando..." : "Escribe tu respuesta..."}
+                placeholder={isListening ? t("mentor.escuchando") : t("mentor.escribeTuRespuesta")}
                 rows={1}
                 className={`w-full resize-none rounded-xl border bg-white px-4 py-3 text-sm text-slate-800 shadow-sm outline-none transition focus:ring-2 ${
                   isListening
@@ -995,7 +999,7 @@ export default function MentorPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={isListening ? stopListening : startListening}
-              title={isListening ? "Detener grabación" : "Hablar con el mentor"}
+              title={isListening ? t("mentor.detenerGrabacion") : t("mentor.hablarConMentor")}
               className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-lg shadow-sm transition-all ${
                 isListening
                   ? "bg-red-600 text-white shadow-red-500/40 shadow-lg ring-4 ring-red-200"
@@ -1050,7 +1054,7 @@ export default function MentorPage() {
             </motion.button>
           </div>
           <p className="mt-2 text-center text-[10px] text-slate-400">
-            Presiona Enter para enviar · Shift+Enter para nueva línea
+            {t("mentor.presionaEnter")} · {t("mentor.shiftEnter")}
           </p>
         </div>
       </div>
