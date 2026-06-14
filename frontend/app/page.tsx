@@ -35,23 +35,7 @@ function FeatureCarousel() {
       accent: "#dc2626",
       href: "/test",
       image: (
-        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full max-h-[260px]">
-          <rect x="30" y="10" width="140" height="180" rx="20" fill="#fef2f2" stroke="#fecaca" strokeWidth="2"/>
-          <rect x="50" y="30" width="100" height="12" rx="6" fill="#dc2626" opacity="0.2"/>
-          <rect x="50" y="32" width="60" height="8" rx="4" fill="#dc2626"/>
-          <circle cx="60" cy="65" r="6" fill="#dc2626" opacity="0.3"/>
-          <rect x="72" y="61" width="70" height="8" rx="4" fill="#fca5a5"/>
-          <circle cx="60" cy="90" r="6" fill="#dc2626" opacity="0.3"/>
-          <rect x="72" y="86" width="55" height="8" rx="4" fill="#fca5a5"/>
-          <circle cx="60" cy="115" r="6" fill="#dc2626" opacity="0.3"/>
-          <rect x="72" y="111" width="65" height="8" rx="4" fill="#fca5a5"/>
-          <circle cx="60" cy="140" r="6" fill="#dc2626" opacity="0.3"/>
-          <rect x="72" y="136" width="45" height="8" rx="4" fill="#fca5a5"/>
-          <circle cx="60" cy="165" r="6" fill="#dc2626" opacity="0.3"/>
-          <rect x="72" y="161" width="55" height="8" rx="4" fill="#fca5a5"/>
-          <circle cx="155" cy="170" r="20" fill="#dc2626" opacity="0.15"/>
-          <path d="M148 170l5 5 10-10" stroke="#dc2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        <img src="/img-carrusel/test-vocacional.png" alt="Test vocacional" className="w-full h-full max-h-[340px] object-contain" />
       ),
     },
     {
@@ -62,21 +46,7 @@ function FeatureCarousel() {
       accent: "#2563eb",
       href: "/carreras",
       image: (
-        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full max-h-[260px]">
-          <circle cx="90" cy="85" r="50" fill="#eff6ff" stroke="#93c5fd" strokeWidth="2"/>
-          <circle cx="90" cy="85" r="35" fill="#dbeafe" stroke="#60a5fa" strokeWidth="2"/>
-          <circle cx="90" cy="85" r="18" fill="#bfdbfe"/>
-          <line x1="130" y1="125" x2="165" y2="160" stroke="#2563eb" strokeWidth="4" strokeLinecap="round"/>
-          <rect x="35" y="140" width="35" height="30" rx="5" fill="#dbeafe" stroke="#93c5fd" strokeWidth="1.5"/>
-          <rect x="40" y="148" width="25" height="4" rx="2" fill="#60a5fa"/>
-          <rect x="40" y="156" width="18" height="3" rx="1.5" fill="#93c5fd"/>
-          <rect x="130" y="25" width="35" height="30" rx="5" fill="#dbeafe" stroke="#93c5fd" strokeWidth="1.5"/>
-          <rect x="135" y="33" width="25" height="4" rx="2" fill="#60a5fa"/>
-          <rect x="135" y="41" width="18" height="3" rx="1.5" fill="#93c5fd"/>
-          <rect x="35" y="30" width="30" height="24" rx="4" fill="#dbeafe" stroke="#93c5fd" strokeWidth="1.5"/>
-          <rect x="39" y="36" width="22" height="3" rx="1.5" fill="#60a5fa"/>
-          <rect x="39" y="42" width="16" height="3" rx="1.5" fill="#93c5fd"/>
-        </svg>
+        <img src="/img-carrusel/explorar-carreras.png" alt="Explorar carreras" className="w-full h-full max-h-[340px] object-contain" />
       ),
     },
     {
@@ -87,22 +57,7 @@ function FeatureCarousel() {
       accent: "#059669",
       href: "/simular",
       image: (
-        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full max-h-[260px]">
-          <rect x="25" y="25" width="150" height="120" rx="18" fill="#ecfdf5" stroke="#a7f3d0" strokeWidth="2"/>
-          <rect x="35" y="35" width="130" height="95" rx="10" fill="#d1fae5"/>
-          <rect x="45" y="55" width="50" height="10" rx="5" fill="#059669" opacity="0.4"/>
-          <rect x="45" y="70" width="70" height="7" rx="3.5" fill="#a7f3d0"/>
-          <rect x="45" y="82" width="60" height="7" rx="3.5" fill="#a7f3d0"/>
-          <rect x="45" y="94" width="55" height="7" rx="3.5" fill="#a7f3d0"/>
-          <rect x="45" y="106" width="65" height="7" rx="3.5" fill="#a7f3d0"/>
-          <circle cx="150" cy="75" r="14" fill="#059669" opacity="0.2"/>
-          <path d="M145 75h10M150 70v10" stroke="#059669" strokeWidth="2.5" strokeLinecap="round"/>
-          <rect x="60" y="155" width="80" height="14" rx="7" fill="#a7f3d0"/>
-          <circle cx="75" cy="162" r="4" fill="#059669"/>
-          <circle cx="100" cy="162" r="4" fill="#059669"/>
-          <circle cx="125" cy="162" r="4" fill="#059669"/>
-          <rect x="55" y="175" width="90" height="6" rx="3" fill="#d1fae5"/>
-        </svg>
+        <img src="/img-carrusel/simular-carrera.png" alt="Simular carrera" className="w-full h-full max-h-[340px] object-contain" />
       ),
     },
     {
@@ -113,22 +68,7 @@ function FeatureCarousel() {
       accent: "#7c3aed",
       href: "/comunidad",
       image: (
-        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full max-h-[260px]">
-          <rect x="15" y="20" width="110" height="70" rx="14" fill="#f5f3ff" stroke="#c4b5fd" strokeWidth="2"/>
-          <rect x="25" y="32" width="55" height="7" rx="3.5" fill="#7c3aed" opacity="0.4"/>
-          <rect x="25" y="44" width="80" height="6" rx="3" fill="#ddd6fe"/>
-          <rect x="25" y="54" width="65" height="6" rx="3" fill="#ddd6fe"/>
-          <rect x="25" y="64" width="75" height="6" rx="3" fill="#ddd6fe"/>
-          <circle cx="110" cy="100" r="18" fill="#7c3aed" opacity="0.15"/>
-          <circle cx="110" cy="100" r="10" fill="#7c3aed" opacity="0.3"/>
-          <rect x="75" y="115" width="110" height="65" rx="14" fill="#f5f3ff" stroke="#c4b5fd" strokeWidth="2"/>
-          <rect x="85" y="128" width="60" height="7" rx="3.5" fill="#7c3aed" opacity="0.4"/>
-          <rect x="85" y="140" width="90" height="6" rx="3" fill="#ddd6fe"/>
-          <rect x="85" y="150" width="55" height="6" rx="3" fill="#ddd6fe"/>
-          <rect x="85" y="160" width="70" height="6" rx="3" fill="#ddd6fe"/>
-          <circle cx="165" cy="45" r="22" fill="#7c3aed" opacity="0.1"/>
-          <path d="M157 45h16M165 37v16" stroke="#7c3aed" strokeWidth="2.5" strokeLinecap="round"/>
-        </svg>
+        <img src="/img-carrusel/comunidad.png" alt="Comunidad" className="w-full h-full max-h-[340px] object-contain" />
       ),
     },
     {
@@ -139,21 +79,7 @@ function FeatureCarousel() {
       accent: "#d97706",
       href: "/mentor",
       image: (
-        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full max-h-[260px]">
-          <circle cx="100" cy="75" r="45" fill="#fffbeb" stroke="#fcd34d" strokeWidth="2"/>
-          <circle cx="100" cy="75" r="32" fill="#fef3c7"/>
-          <circle cx="87" cy="68" r="7" fill="#d97706"/>
-          <circle cx="113" cy="68" r="7" fill="#d97706"/>
-          <path d="M88 85c0 0 6 10 12 10s12-10 12-10" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round"/>
-          <rect x="93" y="28" width="5" height="14" rx="2.5" fill="#fcd34d"/>
-          <circle cx="95.5" cy="24" r="5" fill="#fcd34d"/>
-          <rect x="35" y="130" width="130" height="50" rx="12" fill="#fffbeb" stroke="#fcd34d" strokeWidth="2"/>
-          <rect x="48" y="142" width="70" height="7" rx="3.5" fill="#d97706" opacity="0.3"/>
-          <rect x="48" y="154" width="50" height="6" rx="3" fill="#fcd34d"/>
-          <rect x="48" y="164" width="60" height="5" rx="2.5" fill="#fde68a"/>
-          <circle cx="148" cy="148" r="12" fill="#d97706" opacity="0.2"/>
-          <path d="M144 148l4 4 8-8" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        <img src="/img-carrusel/mentor-ia.png" alt="Mentor IA" className="w-full h-full max-h-[340px] object-contain" />
       ),
     },
     {
@@ -164,20 +90,7 @@ function FeatureCarousel() {
       accent: "#0284c7",
       href: "/laboratorios",
       image: (
-        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full max-h-[260px]">
-          <rect x="25" y="55" width="150" height="110" rx="10" fill="#f0f9ff" stroke="#bae6fd" strokeWidth="2"/>
-          <path d="M100 15L25 55h150L100 15z" fill="#e0f2fe" stroke="#7dd3fc" strokeWidth="2"/>
-          <rect x="42" y="78" width="35" height="50" rx="5" fill="#bae6fd"/>
-          <rect x="82" y="78" width="35" height="50" rx="5" fill="#bae6fd"/>
-          <rect x="122" y="78" width="35" height="50" rx="5" fill="#bae6fd"/>
-          <rect x="48" y="86" width="23" height="34" rx="3" fill="#e0f2fe"/>
-          <rect x="88" y="86" width="23" height="34" rx="3" fill="#e0f2fe"/>
-          <rect x="128" y="86" width="23" height="34" rx="3" fill="#e0f2fe"/>
-          <circle cx="100" cy="38" r="10" fill="#0284c7" opacity="0.2"/>
-          <path d="M96 38l4 4 8-8" stroke="#0284c7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <rect x="35" y="170" width="130" height="8" rx="4" fill="#bae6fd"/>
-          <rect x="55" y="182" width="90" height="6" rx="3" fill="#e0f2fe"/>
-        </svg>
+        <img src="/img-carrusel/laboratorios.png" alt="Laboratorios" className="w-full h-full max-h-[340px] object-contain" />
       ),
     },
     {
@@ -188,23 +101,7 @@ function FeatureCarousel() {
       accent: "#e11d48",
       href: "/recursos",
       image: (
-        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full max-h-[260px]">
-          <rect x="25" y="20" width="40" height="140" rx="7" fill="#ffe4e6" stroke="#fecdd3" strokeWidth="1.5" transform="rotate(-5 45 90)"/>
-          <rect x="60" y="15" width="40" height="150" rx="7" fill="#fff1f2" stroke="#fecdd3" strokeWidth="1.5"/>
-          <rect x="95" y="18" width="40" height="147" rx="7" fill="#ffe4e6" stroke="#fecdd3" strokeWidth="1.5" transform="rotate(3 115 91)"/>
-          <rect x="130" y="22" width="40" height="140" rx="7" fill="#fff1f2" stroke="#fecdd3" strokeWidth="1.5" transform="rotate(6 150 92)"/>
-          <rect x="68" y="32" width="24" height="5" rx="2.5" fill="#e11d48" opacity="0.4"/>
-          <rect x="68" y="42" width="18" height="4" rx="2" fill="#fda4af"/>
-          <rect x="68" y="50" width="22" height="4" rx="2" fill="#fda4af"/>
-          <rect x="68" y="58" width="16" height="4" rx="2" fill="#fda4af"/>
-          <rect x="103" y="36" width="24" height="5" rx="2.5" fill="#e11d48" opacity="0.4"/>
-          <rect x="103" y="46" width="18" height="4" rx="2" fill="#fda4af"/>
-          <rect x="103" y="54" width="22" height="4" rx="2" fill="#fda4af"/>
-          <circle cx="160" cy="170" r="20" fill="#e11d48" opacity="0.1"/>
-          <path d="M152 170l5 5 10-10" stroke="#e11d48" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <rect x="50" y="175" width="100" height="8" rx="4" fill="#ffe4e6"/>
-          <rect x="70" y="188" width="60" height="5" rx="2.5" fill="#fecdd3"/>
-        </svg>
+        <img src="/img-carrusel/recursos.png" alt="Recursos" className="w-full h-full max-h-[340px] object-contain" />
       ),
     },
   ];
@@ -323,14 +220,14 @@ function FeatureCarousel() {
               style={{ background: `${slide.accent}18` }} />
 
             <div className="relative z-10 flex flex-col h-full p-6">
-              <div className="rounded-2xl overflow-hidden mb-4 flex-1 flex items-center justify-center" style={{ background: `${slide.accent}08` }}>
+              <div className="rounded-2xl overflow-hidden mb-1 flex-1 flex items-center justify-center" style={{ background: `${slide.accent}08` }}>
                 {slide.image}
               </div>
 
-              <h3 className="font-black text-xl text-slate-950 mb-1">
+              <h3 className="font-black text-xl text-slate-950 mb-0.5">
                 {slide.title}
               </h3>
-              <p className="text-sm leading-snug text-slate-500 flex-1">
+              <p className="text-sm leading-snug text-slate-500">
                 {slide.description}
               </p>
 
