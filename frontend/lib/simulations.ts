@@ -1459,4 +1459,404 @@ export const simulations: Simulation[] = [
       },
     ],
   },
+
+  // ─────────────────────────────────────────
+  // ADMINISTRACIÓN
+  // ─────────────────────────────────────────
+  {
+    id: "administracion",
+    title: "Administración",
+    emoji: "📊",
+    color: "#4338ca",
+    gradient: "linear-gradient(135deg, #4338ca, #6366f1)",
+    tagline: "¿Tienes lo necesario para dirigir una empresa?",
+    intro:
+      "Eres el nuevo CEO de una empresa mediana peruana. Tu primera semana y ya enfrentas decisiones críticas: estrategia, finanzas, negociación y liderazgo. El directorio espera resultados.",
+    scenes: [
+      {
+        id: 1,
+        chapter: "Escena 1: La estrategia",
+        situation: "El equipo está dividido en dos caminos estratégicos.",
+        narrative:
+          "Tu empresa de retail tiene 3 ubicaciones: una pierde dinero, otra es estable, la tercera crece 25% anual. Tienes S/. 500,000 para invertir. El equipo de ventas quiere expandir, el de finanzas quiere consolidar.",
+        bg: "linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #1e1b4b 100%)",
+        elements: [
+          { emoji: "📊", size: 80, x: "40%", y: "20%", animate: "none", zIndex: 3 },
+          { emoji: "🏢", size: 70, x: "15%", y: "40%", animate: "none", zIndex: 2 },
+          { emoji: "💰", size: 65, x: "65%", y: "40%", animate: "float", zIndex: 2 },
+          { emoji: "💡", size: 60, x: "55%", y: "15%", animate: "pulse", zIndex: 3 },
+          { emoji: "🎯", size: 55, x: "25%", y: "60%", animate: "float", zIndex: 2 },
+          { emoji: "📈", size: 50, x: "80%", y: "55%", animate: "none", zIndex: 1 },
+        ],
+        prompt: "¿Qué decisión estratégica tomas?",
+        choices: [
+          {
+            text: "Cerrar la que pierde y duplicar inversión en la que crece",
+            emoji: "🎯",
+            points: 25,
+            feedback: "Decisión acertada. La reestructuración fue dura pero la empresa creció 40% el siguiente año.",
+            isGood: true,
+          },
+          {
+            text: "Renovar las 3 con un plan conservador para no arriesgar",
+            emoji: "🛡️",
+            points: 10,
+            feedback: "La empresa mantuvo el status quo pero perdió la oportunidad de crecer frente a la competencia.",
+            isGood: false,
+          },
+          {
+            text: "Vender todo y empezar un negocio online",
+            emoji: "💻",
+            points: 5,
+            feedback: "El giro fue demasiado radical. Sin experiencia en e-commerce, la empresa quebró en 8 meses.",
+            isGood: false,
+          },
+        ],
+      },
+      {
+        id: 2,
+        chapter: "Escena 2: Las finanzas",
+        situation: "Los números no cuadran y el directorio presiona.",
+        narrative:
+          "El directorio revisa los estados financieros del trimestre. El EBITDA cayó 15%, el flujo de caja está ajustado y un directivo cuestiona tu plan de inversión. Necesitas defender tu estrategia con datos.",
+        bg: "linear-gradient(160deg, #0f172a 0%, #1e3a5f 60%, #0f172a 100%)",
+        elements: [
+          { emoji: "📊", size: 85, x: "40%", y: "15%", animate: "none", zIndex: 3 },
+          { emoji: "📉", size: 70, x: "15%", y: "35%", animate: "none", zIndex: 2 },
+          { emoji: "📈", size: 70, x: "65%", y: "40%", animate: "none", zIndex: 2 },
+          { emoji: "👔", size: 65, x: "50%", y: "55%", animate: "none", zIndex: 3 },
+          { emoji: "💡", size: 55, x: "80%", y: "20%", animate: "pulse", zIndex: 1 },
+        ],
+        prompt: "¿Cómo respondes al directorio?",
+        choices: [
+          {
+            text: "Presentas datos de crecimiento proyectado y plan de reducción de gastos",
+            emoji: "📋",
+            points: 25,
+            feedback: "El directorio aprobó tu plan. Los siguientes 2 trimestres mostraron recuperación.",
+            isGood: true,
+          },
+          {
+            text: "Minimizas la caída y hablas solo de los logros",
+            emoji: "🙈",
+            points: 5,
+            feedback: "El directorio perdió confianza. La falta de transparencia casi te cuesta el puesto.",
+            isGood: false,
+          },
+          {
+            text: "Propones recortar personal masivamente para ahorrar costos",
+            emoji: "✂️",
+            points: 10,
+            feedback: "El recorte dañó la moral del equipo. La productividad cayó y los mejores talentos renunciaron.",
+            isGood: false,
+          },
+        ],
+      },
+      {
+        id: 3,
+        chapter: "Escena 3: La negociación",
+        situation: "Un proveedor clave quiere renegociar el contrato.",
+        narrative:
+          "Tu proveedor de insumos más importante (60% de tu inventario) pide una reunión urgente. Quiere aumentar 15% el precio por la inflación. Si aceptas tu margen se reduce drásticamente. Si pierdes al proveedor, no puedes operar.",
+        bg: "linear-gradient(160deg, #431407 0%, #7c2d12 60%, #431407 100%)",
+        elements: [
+          { emoji: "🤝", size: 75, x: "50%", y: "20%", animate: "none", zIndex: 3 },
+          { emoji: "📄", size: 70, x: "20%", y: "35%", animate: "none", zIndex: 2 },
+          { emoji: "💰", size: 65, x: "70%", y: "40%", animate: "float", zIndex: 3 },
+          { emoji: "⚖️", size: 60, x: "40%", y: "60%", animate: "float", zIndex: 2 },
+          { emoji: "📞", size: 55, x: "80%", y: "55%", animate: "none", zIndex: 1 },
+        ],
+        prompt: "¿Cómo negocias con el proveedor?",
+        choices: [
+          {
+            text: "Ofreces 5% de aumento a cambio de volumen y un contrato a 3 años",
+            emoji: "📋",
+            points: 25,
+            feedback: "Acuerdo ganar-ganar. El proveedor aceptó y además mejoraste los plazos de pago.",
+            isGood: true,
+          },
+          {
+            text: "Aceptas el 15% para no arriesgar la operación",
+            emoji: "✅",
+            points: 8,
+            feedback: "Tu margen se redujo tanto que casi no hubo ganancia ese trimestre.",
+            isGood: false,
+          },
+          {
+            text: "Te niegas rotundamente y buscas otro proveedor",
+            emoji: "🚫",
+            points: 5,
+            feedback: "Encontrar un proveedor de calidad tomó 3 meses. Perdiste 20% de ventas por desabastecimiento.",
+            isGood: false,
+          },
+        ],
+      },
+      {
+        id: 4,
+        chapter: "Escena 4: El liderazgo",
+        situation: "Tu equipo está desmotivado y los resultados bajan.",
+        narrative:
+          "Han pasado 6 meses desde que asumiste. Los resultados financieros mejoraron pero el equipo está agotado. 3 personas renunciaron, los que quedan trabajan hasta tarde y el clima laboral es tenso. Tu mejor analista pide una reunión privada.",
+        bg: "linear-gradient(160deg, #1c1917 0%, #44403c 60%, #1c1917 100%)",
+        elements: [
+          { emoji: "👥", size: 80, x: "40%", y: "20%", animate: "none", zIndex: 3 },
+          { emoji: "💬", size: 70, x: "15%", y: "40%", animate: "float", zIndex: 2 },
+          { emoji: "😔", size: 65, x: "65%", y: "35%", animate: "none", zIndex: 2 },
+          { emoji: "💡", size: 60, x: "50%", y: "60%", animate: "pulse", zIndex: 3 },
+          { emoji: "🌱", size: 55, x: "80%", y: "55%", animate: "float", zIndex: 1 },
+        ],
+        prompt: "¿Cómo manejas la crisis de equipo?",
+        choices: [
+          {
+            text: "Reúnes a todo el equipo, escuchas sus preocupaciones y propones mejoras concretas",
+            emoji: "🤝",
+            points: 25,
+            feedback: "El equipo valoró la transparencia. Implementaste horarios flexibles y la rotación se redujo.",
+            isGood: true,
+          },
+          {
+            text: "Dices que es normal en épocas de cambio y que se van a acostumbrar",
+            emoji: "🙅",
+            points: 5,
+            feedback: "Dos personas más renunciaron la semana siguiente. El equipo perdió toda confianza en tu liderazgo.",
+            isGood: false,
+          },
+          {
+            text: "Ofreces bonos económicos para que se queden",
+            emoji: "💰",
+            points: 12,
+            feedback: "Los bonos funcionaron a corto plazo pero no resolvieron los problemas de fondo. 3 meses después el problema volvió.",
+            isGood: false,
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────
+  // ENFERMERÍA
+  // ─────────────────────────────────────────
+  {
+    id: "enfermeria",
+    title: "Enfermería",
+    emoji: "🩹",
+    color: "#0d9488",
+    gradient: "linear-gradient(135deg, #0d9488, #2dd4bf)",
+    tagline: "¿Tienes la vocación para cuidar vidas?",
+    intro:
+      "Eres enfermero en el Hospital Nacional. Son las 7am cuando empieza tu turno. 20 pacientes asignados, 3 en estado crítico. Tu jefa te dice: 'Hoy tenemos poco personal. Confío en ti.'",
+    scenes: [
+      {
+        id: 1,
+        chapter: "Escena 1: Triaje",
+        situation: "Llegan 3 pacientes nuevos a la vez. Tienes que priorizar.",
+        narrative:
+          "Son las 8am. Entran tres pacientes a la vez: (1) Hombre 45 años, dolor en el pecho, sudoración fría. (2) Mujer 72 años, fiebre 39°C, confusión, presión 90/60. (3) Joven 20 años, corte superficial en el brazo. Tu jefa está en una emergencia. La decisión es tuya.",
+        bg: "linear-gradient(160deg, #021a19 0%, #0d3d39 60%, #021a19 100%)",
+        elements: [
+          { emoji: "🆘", size: 80, x: "40%", y: "15%", animate: "pulse", zIndex: 3 },
+          { emoji: "🏥", size: 75, x: "15%", y: "35%", animate: "none", zIndex: 2 },
+          { emoji: "🩺", size: 70, x: "65%", y: "40%", animate: "none", zIndex: 2 },
+          { emoji: "⏱️", size: 60, x: "55%", y: "15%", animate: "spin", zIndex: 3 },
+          { emoji: "❤️", size: 55, x: "30%", y: "60%", animate: "pulse", zIndex: 2 },
+          { emoji: "💊", size: 50, x: "78%", y: "60%", animate: "float", zIndex: 1 },
+        ],
+        prompt: "¿A quién atiendes primero?",
+        choices: [
+          {
+            text: "Al hombre con dolor en el pecho — probable infarto. Luego la mujer con fiebre y confusión",
+            emoji: "🫀",
+            points: 25,
+            feedback: "¡Triaje correcto! El hombre era un IAM en evolución. Lo estabilizaste a tiempo.",
+            isGood: true,
+          },
+          {
+            text: "A la mujer de 72 — la confusión y fiebre pueden ser sepsis",
+            emoji: "🌡️",
+            points: 15,
+            feedback: "Buena intuición. La mujer tenía sepsis, pero mientras la atendías el hombre sufrió un paro cardíaco.",
+            isGood: false,
+          },
+          {
+            text: "Al joven del corte — para despejar la sala rápido",
+            emoji: "🩹",
+            points: 3,
+            feedback: "Error crítico. El hombre sufrió un infarto masivo mientras vendabas un rasguño.",
+            isGood: false,
+          },
+        ],
+      },
+      {
+        id: 2,
+        chapter: "Escena 2: Medicación",
+        situation: "Debes administrar medicamentos a 4 pacientes a la vez.",
+        narrative:
+          "Son las 10am y tienes 4 medicamentos listos para administrar. Pero en el carro de medicación encuentras que alguien movió las etiquetas. Tienes: amoxicilina 875mg, enoxaparina 40mg, morfina 5mg y paracetamol 500mg. Cada uno va a un paciente diferente.",
+        bg: "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)",
+        elements: [
+          { emoji: "💊", size: 80, x: "40%", y: "20%", animate: "none", zIndex: 3 },
+          { emoji: "💉", size: 70, x: "60%", y: "35%", animate: "float", zIndex: 2 },
+          { emoji: "📋", size: 65, x: "15%", y: "40%", animate: "none", zIndex: 2 },
+          { emoji: "⚠️", size: 60, x: "45%", y: "50%", animate: "pulse", zIndex: 3 },
+          { emoji: "🧪", size: 55, x: "78%", y: "55%", animate: "none", zIndex: 1 },
+        ],
+        prompt: "¿Cuál es tu prioridad al administrar?",
+        choices: [
+          {
+            text: "Verificar cada paciente con su pulsera, cotejar indicación y administrar uno a uno",
+            emoji: "✅",
+            points: 25,
+            feedback: "Protocolo perfecto. Verificaste cada identificación y evitaste una confusión que pudo ser fatal.",
+            isGood: true,
+          },
+          {
+            text: "Confías en tu memoria y administras rápido para no retrasarte",
+            emoji: "⚡",
+            points: 5,
+            feedback: "Casi le das morfina al paciente de amoxicilina. Error grave que pudo costar una vida.",
+            isGood: false,
+          },
+          {
+            text: "Pides ayuda a tu colega para terminar más rápido",
+            emoji: "🙋",
+            points: 10,
+            feedback: "Tu colega también estaba sobrecargada. En el apuro, se confundieron dos pacientes.",
+            isGood: false,
+          },
+        ],
+      },
+      {
+        id: 3,
+        chapter: "Escena 3: Paro cardíaco",
+        situation: "Un paciente se desploma. Tienes que actuar.",
+        narrative:
+          "Son las 2pm. Estás pasando medicación cuando escuchas un golpe. El señor López, 65 años, post-operatorio de bypass, se ha caído al suelo. No responde, no respira. El monitor muestra fibrilación ventricular. El médico de turno está en el quirófano.",
+        bg: "linear-gradient(160deg, #450a0a 0%, #7f1d1d 60%, #450a0a 100%)",
+        elements: [
+          { emoji: "🆘", size: 80, x: "40%", y: "10%", animate: "pulse", zIndex: 3 },
+          { emoji: "❤️", size: 85, x: "55%", y: "25%", animate: "pulse", zIndex: 2 },
+          { emoji: "⚡", size: 70, x: "25%", y: "40%", animate: "pulse", zIndex: 3 },
+          { emoji: "💨", size: 65, x: "65%", y: "45%", animate: "float", zIndex: 2 },
+          { emoji: "⏱️", size: 55, x: "15%", y: "60%", animate: "spin", zIndex: 1 },
+          { emoji: "🏥", size: 50, x: "78%", y: "60%", animate: "none", zIndex: 1 },
+        ],
+        prompt: "¿Cuál es tu primer paso?",
+        choices: [
+          {
+            text: "Activas código de paro, inicias RCP y pides el DEA",
+            emoji: "🚨",
+            points: 25,
+            feedback: "Protocolo impecable. El DEA aplicó una descarga y el ritmo cardíaco volvió. ¡Salvaste a López!",
+            isGood: true,
+          },
+          {
+            text: "Empiezas RCP pero sin llamar al código de paro primero",
+            emoji: "🤲",
+            points: 8,
+            feedback: "Hiciste RCP sola por 4 minutos hasta que llegó ayuda. Cada minuto sin DEA reduce 10% la supervivencia.",
+            isGood: false,
+          },
+          {
+            text: "Corres a buscar al médico antes de hacer algo",
+            emoji: "🏃",
+            points: 3,
+            feedback: "Perdiste 3 minutos buscando al médico. Cuando regresaste, el paciente estaba en asistolia.",
+            isGood: false,
+          },
+        ],
+      },
+      {
+        id: 4,
+        chapter: "Escena 4: El cuidado humano",
+        situation: "Un paciente terminal necesita más que medicinas.",
+        narrative:
+          "Son las 6pm. La señora Rosa, 80 años, cáncer terminal, te llama. No tiene familia cerca. Todos los días a esta hora te llama para lo mismo: '¿Crees que he sido buena persona?' No necesita medicación. Necesita compañía. Su signos están estables pero hay 5 pacientes más esperando.",
+        bg: "linear-gradient(160deg, #064e3b 0%, #065f46 60%, #022c22 100%)",
+        elements: [
+          { emoji: "👵", size: 75, x: "50%", y: "25%", animate: "none", zIndex: 3 },
+          { emoji: "❤️", size: 70, x: "20%", y: "35%", animate: "pulse", zIndex: 2 },
+          { emoji: "💬", size: 65, x: "70%", y: "40%", animate: "float", zIndex: 2 },
+          { emoji: "🌿", size: 60, x: "40%", y: "60%", animate: "float", zIndex: 2 },
+          { emoji: "✨", size: 55, x: "80%", y: "20%", animate: "pulse", zIndex: 1 },
+          { emoji: "🕊️", size: 50, x: "5%", y: "50%", animate: "float", zIndex: 1 },
+        ],
+        prompt: "¿Qué haces con la señora Rosa?",
+        choices: [
+          {
+            text: "Te sientas 5 minutos, tomas su mano y le dices: 'Cuénteme de su vida, señora Rosa'",
+            emoji: "🤗",
+            points: 25,
+            feedback: "Esa conversación fue la más valiosa de su día. La señora Rosa sonrió y dijo: 'Eres como mi nieta'.",
+            isGood: true,
+          },
+          {
+            text: "Le dices que estás ocupada pero que la enfermera de noche vendrá",
+            emoji: "⏰",
+            points: 8,
+            feedback: "La señora Rosa se sintió abandonada. El cuidado humanizado es también parte de la enfermería.",
+            isGood: false,
+          },
+          {
+            text: "Le pides que hable con el psicólogo del hospital",
+            emoji: "🗣️",
+            points: 10,
+            feedback: "Derivar no es malo, pero el psicólogo no estaba disponible hasta el día siguiente. Ella necesitaba a alguien en ese momento.",
+            isGood: false,
+          },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────
+  // PRÓXIMAMENTE (placeholder)
+  // ─────────────────────────────────────────
+  {
+    id: "proximamente",
+    title: "Próximamente más simulaciones",
+    emoji: "🔮",
+    color: "#6b7280",
+    gradient: "linear-gradient(135deg, #4b5563, #9ca3af)",
+    tagline: "Nuevas carreras en camino",
+    intro: "Estamos trabajando en nuevas simulaciones interactivas para más carreras. ¡Vuelve pronto!",
+    scenes: [
+      {
+        id: 1,
+        chapter: "Próximamente",
+        situation: "Más simulaciones están siendo desarrolladas.",
+        narrative: "Estamos creando experiencias interactivas para todas las carreras de la UTP. Esta simulación estará disponible pronto.",
+        bg: "linear-gradient(160deg, #1f2937 0%, #374151 60%, #1f2937 100%)",
+        elements: [
+          { emoji: "🔮", size: 80, x: "40%", y: "25%", animate: "float", zIndex: 3 },
+          { emoji: "✨", size: 60, x: "15%", y: "40%", animate: "pulse", zIndex: 2 },
+          { emoji: "🌟", size: 60, x: "70%", y: "40%", animate: "pulse", zIndex: 2 },
+          { emoji: "🚀", size: 55, x: "50%", y: "65%", animate: "float", zIndex: 1 },
+        ],
+        prompt: "¿Qué esperas de las próximas simulaciones?",
+        choices: [
+          {
+            text: "Explorar otras carreras disponibles en el catálogo",
+            emoji: "🔍",
+            points: 25,
+            feedback: "Pronto tendrás simulaciones para todas las carreras UTP.",
+            isGood: true,
+          },
+          {
+            text: "Volver a las simulaciones actuales disponibles",
+            emoji: "🔄",
+            points: 15,
+            feedback: "Hay más simulaciones listas para jugar ahora mismo.",
+            isGood: false,
+          },
+          {
+            text: "Esperar a que todas estén listas",
+            emoji: "⏳",
+            points: 5,
+            feedback: "Puedes disfrutar las que ya están disponibles mientras tanto.",
+            isGood: false,
+          },
+        ],
+      },
+    ],
+  },
 ];

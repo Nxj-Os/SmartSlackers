@@ -18,8 +18,8 @@ const CYCLE_ICONS = [
   "🔧", "📐", "🎯", "📜",
 ];
 
-const HORIZONTAL_GAP = 220;
-const BASE_X = 40;
+const HORIZONTAL_GAP = 320;
+const BASE_X = 60;
 const ROW_Y = 300;
 
 function col(i: number) {

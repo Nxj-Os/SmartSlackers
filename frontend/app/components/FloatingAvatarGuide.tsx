@@ -205,12 +205,19 @@ export default function FloatingAvatarGuide() {
 
       {/* ── Botón flotante ── */}
       <motion.button
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.1, rotate: [0, -10, 10, -10, 0] }}
+        whileTap={{ scale: 0.93 }}
         onClick={() => { setOpen((v) => !v); setBubble(null); }}
         aria-label="Guía Dino"
         className="fixed bottom-6 left-6 z-50 overflow-hidden rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.18)] ring-2 ring-white"
         style={{ width: 56, height: 56 }}
+        initial={{ scale: 0.7, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1, y: [0, -3, 0] }}
+        transition={{
+          scale: { duration: 0.4, ease: "easeOut" },
+          opacity: { duration: 0.4, ease: "easeOut" },
+          y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.6 },
+        }}
       >
         {isDino
           ? <DinosaurSVG career={dinoCareer} size={56} />

@@ -5,15 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { useTranslation } from "@/lib/i18n";
 
-// Stable star data for astronauta card
-const ASTRO_STARS = Array.from({ length: 40 }, (_, i) => ({
-  id: i,
-  left: parseFloat(((i * 37.3) % 100).toFixed(1)),
-  top: parseFloat(((i * 53.7) % 100).toFixed(1)),
-  w: parseFloat(((i % 3) * 0.7 + 0.5).toFixed(1)),
-  opacity: parseFloat(((i % 5) * 0.12 + 0.15).toFixed(2)),
-}));
-
 type Deco = { t: string; x: number; y: number; s: number; o: number; color?: string };
 
 type CareerCard = {
@@ -34,20 +25,6 @@ type CareerCard = {
 
 function getCareerCards(t: (key: string) => string): CareerCard[] {
   return [
-    {
-      id: "astronauta",
-      href: "/simular/astronauta",
-      emoji: "🚀",
-      title: t("simular.astronautaTitle"),
-      tagline: t("simular.astronautaTagline"),
-      color: "#fbbf24",
-      gradient: "linear-gradient(135deg,#dc2626,#f97316)",
-      bg: "radial-gradient(ellipse at 30% 30%, #0f0c29 0%, #000510 100%)",
-      border: "rgba(255,255,255,0.18)",
-      badge: t("simular.astronautaExclusivo"),
-      features: [t("simular.astronautaLanzamiento"), t("simular.astronautaAsteroides"), t("simular.astronautaAterrizaje"), t("simular.astronautaPaseoLunar")],
-      decos: [],
-    },
     {
       id: "medicina",
       href: "/simular/medicina",
@@ -215,6 +192,66 @@ function getCareerCards(t: (key: string) => string): CareerCard[] {
         { t: "💎", x: 21, y: 16, s: 1.1, o: 0.24 },
       ],
     },
+    {
+      id: "administracion",
+      href: "/simular/administracion",
+      emoji: "📊",
+      title: t("simular.administracionTitle"),
+      tagline: t("simular.administracionTagline"),
+      color: "#e0e7ff",
+      gradient: "linear-gradient(135deg,#4338ca,#818cf8)",
+      bg: "linear-gradient(145deg, #1e1b4b 0%, #3730a3 55%, #4338ca 100%)",
+      border: "rgba(224,231,255,0.4)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "📊", x: 70, y: 7, s: 1.7, o: 0.28 },
+        { t: "💼", x: 7, y: 63, s: 1.5, o: 0.28 },
+        { t: "📈", x: 76, y: 66, s: 1.4, o: 0.25 },
+        { t: "🎯", x: 52, y: 80, s: 1.3, o: 0.22 },
+        { t: "💡", x: 21, y: 16, s: 1.2, o: 0.24 },
+      ],
+    },
+    {
+      id: "enfermeria",
+      href: "/simular/enfermeria",
+      emoji: "🩹",
+      title: t("simular.enfermeriaTitle"),
+      tagline: t("simular.enfermeriaTagline"),
+      color: "#ccfbf1",
+      gradient: "linear-gradient(135deg,#0d9488,#2dd4bf)",
+      bg: "linear-gradient(145deg, #0f3d3a 0%, #0d9488 55%, #14b8a6 100%)",
+      border: "rgba(204,251,241,0.4)",
+      badge: t("simular.juegoReal"),
+      features: [],
+      decos: [
+        { t: "🩹", x: 70, y: 7, s: 1.7, o: 0.28 },
+        { t: "💉", x: 7, y: 63, s: 1.5, o: 0.28 },
+        { t: "🏥", x: 76, y: 66, s: 1.5, o: 0.25 },
+        { t: "❤️", x: 52, y: 80, s: 1.3, o: 0.25 },
+        { t: "🩺", x: 21, y: 16, s: 1.2, o: 0.24 },
+      ],
+    },
+    {
+      id: "proximamente",
+      href: "",
+      emoji: "🔮",
+      title: "Próximamente",
+      tagline: "Estamos preparando nuevas simulaciones para que sigas explorando tu vocación.",
+      color: "#cbd5e1",
+      gradient: "linear-gradient(135deg,#475569,#94a3b8)",
+      bg: "linear-gradient(145deg, #0f172a 0%, #1e293b 55%, #334155 100%)",
+      border: "rgba(203,213,225,0.2)",
+      badge: "🚧 Próximamente",
+      features: [],
+      decos: [
+        { t: "⏳", x: 70, y: 7, s: 1.7, o: 0.25 },
+        { t: "✨", x: 7, y: 63, s: 1.5, o: 0.2 },
+        { t: "🔧", x: 76, y: 66, s: 1.5, o: 0.22 },
+        { t: "⭐", x: 52, y: 80, s: 1.3, o: 0.2 },
+        { t: "💫", x: 21, y: 16, s: 1.1, o: 0.18 },
+      ],
+    },
   ];
 }
 
@@ -349,35 +386,30 @@ function Carousel({ cards, t }: { cards: CareerCard[]; t: (key: string, params?:
           WebkitOverflowScrolling: "touch",
         }}
       >
-        {cards.map((card, i) => (
-          <motion.a
+        {cards.map((card, i) => {
+          const isPlaceholder = !card.href;
+          const Tag = isPlaceholder ? motion.div : motion.a;
+          const extra: Record<string, unknown> = {};
+          if (!isPlaceholder) { extra.href = card.href; extra.textDecoration = "none"; }
+          return (
+          <Tag
             key={card.id}
-            href={card.href}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.06 }}
-            whileHover={{ y: -6, scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={isPlaceholder ? {} : { y: -6, scale: 1.02 }}
+            whileTap={isPlaceholder ? {} : { scale: 0.97 }}
             className="relative shrink-0 flex flex-col overflow-hidden rounded-3xl shadow-xl"
             style={{
               width: CARD_W,
-              minHeight: card.id === "astronauta" ? 380 : 300,
+              minHeight: 300,
               background: card.bg,
               border: `1.5px solid ${card.border}`,
               scrollSnapAlign: "start",
-              textDecoration: "none",
+              cursor: isPlaceholder ? "default" : "pointer",
+              ...extra,
             }}
           >
-            {/* Astronauta: star field */}
-            {card.id === "astronauta" && (
-              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-                {ASTRO_STARS.map((s) => (
-                  <div key={s.id} className="absolute rounded-full bg-white"
-                    style={{ left: `${s.left}%`, top: `${s.top}%`, width: s.w, height: s.w, opacity: s.opacity }} />
-                ))}
-              </div>
-            )}
-
             {/* Career-specific SVG layers */}
             {card.svgType === "ecg" && <EcgLayer />}
             {card.svgType === "grid" && <GridLayer />}
@@ -405,10 +437,8 @@ function Carousel({ cards, t }: { cards: CareerCard[]; t: (key: string, params?:
             ))}
 
             {/* Highlight shimmer */}
-            {card.id !== "astronauta" && (
-              <div className="absolute -right-8 -top-8 w-28 h-28 rounded-full blur-3xl"
-                style={{ background: "rgba(255,255,255,0.15)" }} />
-            )}
+            <div className="absolute -right-8 -top-8 w-28 h-28 rounded-full blur-3xl"
+              style={{ background: "rgba(255,255,255,0.15)" }} />
 
             {/* Card content */}
             <div className="relative z-10 flex flex-col h-full p-5">
@@ -418,19 +448,12 @@ function Carousel({ cards, t }: { cards: CareerCard[]; t: (key: string, params?:
                   style={{ background: card.gradient }}>
                   {card.badge}
                 </span>
-                {card.id === "astronauta" && (
-                  <span className="rounded-full px-2 py-1 text-[10px] font-bold text-white/70 border border-white/20">
-                    {t("simular.modoExperimental")}
-                  </span>
-                )}
               </div>
 
               {/* Emoji */}
               <motion.div
                 className="text-6xl mb-3"
-                animate={card.id === "astronauta"
-                  ? { y: [0, -10, 0], rotate: [0, 4, -4, 0] }
-                  : { rotate: [0, -4, 4, 0] }}
+                animate={{ rotate: [0, -4, 4, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
               >
                 {card.emoji}
@@ -444,26 +467,15 @@ function Carousel({ cards, t }: { cards: CareerCard[]; t: (key: string, params?:
                 {card.tagline}
               </p>
 
-              {/* Feature pills (astronauta only) */}
-              {card.features.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {card.features.map((f) => (
-                    <span key={f} className="rounded-full px-2 py-0.5 text-[10px] font-medium text-white/70"
-                      style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                      {f}
-                    </span>
-                  ))}
-                </div>
-              )}
-
               {/* CTA */}
               <div className="flex items-center gap-1.5 text-xs font-bold mt-auto text-white/80">
                 <span>{t("simular.jugarAhora")}</span>
                 <motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
               </div>
             </div>
-          </motion.a>
-        ))}
+          </Tag>
+          );
+        })}
 
         {/* trailing spacer */}
         <div className="shrink-0 w-4" />
