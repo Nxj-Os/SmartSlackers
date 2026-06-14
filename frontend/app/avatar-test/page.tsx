@@ -11,7 +11,7 @@ export default function AvatarPage() {
   const [user, loading] = useAuthState(auth);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50 dark:bg-none dark:bg-[#101014]">
       <Navbar />
 
       <div className="mx-auto max-w-6xl px-4 pt-10 pb-20">
@@ -22,13 +22,13 @@ export default function AvatarPage() {
           transition={{ duration: 0.5 }}
           className="mb-10 text-center"
         >
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-red-100 bg-white px-4 py-1.5 text-xs font-semibold text-red-600 shadow-sm">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-red-100 dark:border-red-900/40 bg-white dark:bg-slate-800 px-4 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 shadow-sm">
             🎨 Personalización de avatar
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
             Tu Avatar Vocacional
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-slate-500">
+          <p className="mx-auto mt-3 max-w-xl text-slate-500 dark:text-slate-400">
             Tu avatar cambia de ropa por completo según tu carrera ideal.
             Completa el test vocacional para desbloquear el traje de tu especialidad.
           </p>
@@ -39,13 +39,13 @@ export default function AvatarPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mx-auto max-w-md rounded-3xl border border-slate-100 bg-white p-8 shadow-xl text-center"
+            className="mx-auto max-w-md rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 shadow-xl text-center"
           >
             <div className="mx-auto mb-4 w-fit overflow-hidden rounded-2xl shadow-md">
               <DinosaurSVG size={180} />
             </div>
-            <h2 className="text-xl font-bold text-slate-800">¡Hola! Soy Dino 🦕</h2>
-            <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">¡Hola! Soy Dino 🦕</h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Inicia sesión para crear y personalizar tu avatar vocacional.
               Una vez que completes el test, tu avatar recibirá el traje de tu carrera ideal.
             </p>
@@ -70,7 +70,7 @@ export default function AvatarPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="mx-auto mb-8 max-w-2xl rounded-2xl border border-amber-100 bg-amber-50 px-5 py-3 text-sm text-amber-800"
+              className="mx-auto mb-8 max-w-2xl rounded-2xl border border-amber-100 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950 px-5 py-3 text-sm text-amber-800 dark:text-amber-300"
             >
               <span className="font-semibold">💡 Tip:</span> Completa el test vocacional y tu avatar recibirá automáticamente el traje completo de tu carrera. ¡Cada carrera tiene un traje único!
             </motion.div>
@@ -86,10 +86,10 @@ export default function AvatarPage() {
           transition={{ delay: 0.4, duration: 0.5 }}
           className="mt-16"
         >
-          <h2 className="mb-2 text-center text-2xl font-bold text-slate-800">
+          <h2 className="mb-2 text-center text-2xl font-bold text-slate-800 dark:text-slate-100">
             Trajes disponibles
           </h2>
-          <p className="mb-8 text-center text-sm text-slate-400">
+          <p className="mb-8 text-center text-sm text-slate-400 dark:text-slate-500">
             Completa el test para desbloquear el traje de tu carrera
           </p>
           <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-7">
@@ -115,10 +115,10 @@ export default function AvatarPage() {
                 transition={{ type: "spring", stiffness: 300 }}
                 className="flex flex-col items-center gap-1.5"
               >
-                <div className="overflow-hidden rounded-2xl shadow-md border border-slate-100">
+                <div className="overflow-hidden rounded-2xl shadow-md border border-slate-100 dark:border-slate-700">
                   <DinosaurSVG career={career} size={90} />
                 </div>
-                <span className="text-[11px] font-semibold text-slate-600 text-center leading-tight">
+                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 text-center leading-tight">
                   {emoji} {label}
                 </span>
               </motion.div>

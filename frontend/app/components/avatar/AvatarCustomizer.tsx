@@ -132,7 +132,7 @@ export default function AvatarCustomizer({
         <h3 className="text-lg font-bold">Tu Avatar</h3>
 
         {/* Selector tipo de avatar */}
-        <div className="flex gap-2 rounded-xl border border-border bg-slate-50 p-1">
+        <div className="flex gap-2 rounded-xl border border-border bg-slate-50 dark:bg-slate-800 p-1">
           {([
             { v: "person" as const, icon: "🧑", label: "Persona" },
             { v: "dino"   as const, icon: "🦕", label: "Dinosaurio" },
@@ -146,8 +146,8 @@ export default function AvatarCustomizer({
                 onClick={() => update("avatarType", v)}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                   active
-                    ? "bg-white shadow text-slate-900"
-                    : "text-slate-500 hover:text-slate-700"
+                    ? "bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-slate-100"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 }`}
               >
                 <span>{icon}</span> {label}
@@ -210,7 +210,7 @@ export default function AvatarCustomizer({
                           background: unlocked.background,
                         }));
                       }}
-                      className={`px-3 py-2 rounded-full text-xs font-semibold transition ${isActive ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}
+                      className={`px-3 py-2 rounded-full text-xs font-semibold transition ${isActive ? "bg-slate-950 dark:bg-slate-200 text-white dark:text-slate-900" : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"}`}
                       style={isActive ? { boxShadow: "0 10px 24px rgba(15,23,42,0.16)" } : undefined}
                     >
                       {unlocked.badge} {unlocked.label}
@@ -244,9 +244,9 @@ export default function AvatarCustomizer({
       <Card className="w-full max-w-md">
         <CardContent className="pt-6">
           {(config.avatarType ?? "person") === "dino" && (
-            <div className="rounded-xl bg-green-50 border border-green-100 px-4 py-3 mb-4 text-center">
-              <p className="text-xs font-semibold text-green-700 mb-1">🦕 Modo Dinosaurio</p>
-              <p className="text-xs text-green-600 leading-relaxed">
+            <div className="rounded-xl bg-green-50 dark:bg-green-950 border border-green-100 dark:border-green-800 px-4 py-3 mb-4 text-center">
+              <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">🦕 Modo Dinosaurio</p>
+              <p className="text-xs text-green-600 dark:text-green-500 leading-relaxed">
                 Tu Dino cambia de traje automáticamente según tu carrera vocacional.
                 Completa el test para desbloquear nuevos trajes.
               </p>

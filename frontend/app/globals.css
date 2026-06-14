@@ -491,6 +491,133 @@ html.dark .shadow-lg {
 }
 
 /* ════════════════════════════════════════════════════════
+   FONDOS TAILWIND JIT — degradados con colores claros
+   hardcodeados en clases arbitrarias  bg-[...]
+   El selector [class*="..."] busca la subcadena en el
+   atributo class del HTML renderizado.
+   ════════════════════════════════════════════════════════ */
+
+/* Degradados rosados / crema del Mentor IA y otras páginas */
+html.dark [class*="#fff5f5"],
+html.dark [class*="#fef2f2"],
+html.dark [class*="#fef9f9"],
+html.dark [class*="#fff2f2"],
+html.dark [class*="#fffbf0"],
+html.dark [class*="#fef3c7"],
+html.dark [class*="#fffbeb"],
+html.dark [class*="#fafafa"],
+html.dark [class*="#f8fafc"] {
+  background: #101014 !important;
+}
+
+/* bg-white/XX — solo opacidades altas (70 %+) para no oscurecer
+   bg-white/10 o bg-white/15 usados como tinte sutil en la sección roja */
+html.dark [class*="bg-white\/7"],
+html.dark [class*="bg-white\/8"],
+html.dark [class*="bg-white\/9"],
+html.dark [class*="bg-white\/100"] {
+  background-color: rgba(18, 18, 26, 0.92) !important;
+}
+
+/* border-white/XX */
+html.dark [class*="border-white\/"] {
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* ── Mentor IA: burbujas del asistente (bg-white) ───────── */
+/* bg-white ya cubierto por [class*="bg-white"], pero refuerzo
+   específicamente las burbujas de chat */
+html.dark [class*="bg-white"][class*="rounded-2xl"],
+html.dark [class*="bg-white"][class*="rounded-bl"] {
+  background-color: #1e1e2a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e2e2ea !important;
+}
+
+/* ── Mentor IA: estado "en línea / desconectado / conectando" ─ */
+html.dark [class*="bg-green-50"][class*="rounded-full"] {
+  background-color: rgba(6, 40, 22, 0.70) !important;
+}
+html.dark [class*="text-green-700"] {
+  color: #6ee7b7 !important;
+}
+html.dark [class*="bg-red-50"][class*="rounded-full"] {
+  background-color: rgba(60, 10, 10, 0.70) !important;
+}
+html.dark [class*="text-red-600"][class*="text-\[10px\]"],
+html.dark [class*="bg-red-50"] [class*="text-red-600"] {
+  color: #fca5a5 !important;
+}
+html.dark [class*="bg-slate-50"][class*="rounded-full"] {
+  background-color: rgba(25, 25, 35, 0.70) !important;
+}
+
+/* ── Mentor IA: tarjetas de carrera (bg-white/80) ──────────── */
+html.dark [class*="bg-white\/80"][class*="rounded-2xl"],
+html.dark [class*="bg-white\/60"][class*="rounded-2xl"] {
+  background-color: rgba(20, 20, 30, 0.90) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Mentor IA: tarjetas info (border-white/60 bg-white/60) ─ */
+html.dark [class*="bg-white\/60"],
+html.dark [class*="bg-white\/70"] {
+  background-color: rgba(18, 18, 26, 0.88) !important;
+}
+
+/* ── Mentor IA: modal "limpiar conversación" (bg-white) ────── */
+/* Cubierto por [class*="bg-white"] global */
+
+/* ── Botones con gradiente rojo→naranja: fuerza texto blanco ── */
+/* El botón "Comenzar mi viaje" tiene from-red-600 via-rose-600 to-orange-500;
+   en dark mode shadcn pone text-primary-foreground oscuro → se ve oscuro.
+   Requiere AMBAS clases para no afectar otras cosas. */
+html.dark [class*="from-red-600"][class*="via-rose-600"] {
+  color: white !important;
+}
+
+/* ── Mentor IA: banner de error (gradient rojo/blanco) ─────── */
+/* Requiere AMBAS clases para no hacer match en gradientes de branding */
+html.dark [class*="from-red-50"][class*="via-white"] {
+  background: #1a1015 !important;
+}
+html.dark [class*="border-red-100"] {
+  border-color: rgba(200, 60, 60, 0.25) !important;
+}
+html.dark [class*="bg-red-100"] {
+  background-color: rgba(80, 20, 20, 0.50) !important;
+}
+html.dark [class*="text-red-500"] {
+  color: #f87171 !important;
+}
+html.dark [class*="text-slate-900"] {
+  color: #e8e8f0 !important;
+}
+html.dark [class*="text-slate-500"] {
+  color: #8888a8 !important;
+}
+
+/* ── Avatar Customizer: fondo modal (backgroundImage inline) ─ */
+/* Cubierto por [style*="linear-gradient(to bottom right, rgb(255"]
+   pero también por backgroundImage camelCase → background-image en DOM */
+html.dark [style*="background-image: linear-gradient"] {
+  background-image: none !important;
+  background-color: rgba(18, 18, 26, 0.98) !important;
+}
+
+/* ── Avatar Customizer: banner modo dinosaurio ──────────────── */
+html.dark [class*="bg-green-50"][class*="border-green-100"] {
+  background-color: rgba(5, 35, 20, 0.60) !important;
+  border-color: rgba(20, 80, 50, 0.40) !important;
+}
+html.dark [class*="text-green-700"] {
+  color: #86efac !important;
+}
+html.dark [class*="text-green-600"] {
+  color: #6ee7b7 !important;
+}
+
+/* ════════════════════════════════════════════════════════
    TEST VOCACIONAL — colores específicos no cubiertos
    ════════════════════════════════════════════════════════ */
 
