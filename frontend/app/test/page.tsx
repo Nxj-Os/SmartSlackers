@@ -65,10 +65,7 @@ export default function TestPage() {
   const isDino = !avatarConfig || (avatarConfig.avatarType ?? "dino") === "dino";
 
   return (
-    <main style={{
-      minHeight: "100vh",
-      background: "radial-gradient(circle at top, #fff2f2 0%, #fff6f5 45%, #faf5f5 100%)",
-    }}>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#fff2f2_0%,#fff6f5_45%,#faf5f5_100%)]">
       <Navbar />
 
       {/* ── Botón "Salir" visible durante el test ── */}
@@ -79,25 +76,7 @@ export default function TestPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowExitModal(true)}
-            style={{
-              position: "fixed",
-              top: "70px",
-              right: "16px",
-              zIndex: 50,
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "6px 14px",
-              background: "rgba(255,255,255,0.92)",
-              border: "1px solid rgba(255,0,0,0.2)",
-              borderRadius: "20px",
-              color: "#cc2b2b",
-              fontSize: "13px",
-              fontWeight: 600,
-              cursor: "pointer",
-              backdropFilter: "blur(8px)",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-            }}
+            className="fixed top-[70px] right-4 z-50 flex items-center gap-1.5 py-1.5 px-3.5 bg-white/92 border border-red-500/20 rounded-[20px] text-[#cc2b2b] text-[13px] font-semibold cursor-pointer backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
           >
             ✕ Salir del test
           </motion.button>
@@ -111,12 +90,7 @@ export default function TestPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{
-              position: "fixed", inset: 0, zIndex: 100,
-              background: "rgba(0,0,0,0.45)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              padding: "1rem",
-            }}
+            className="fixed inset-0 z-[100] bg-black/45 flex items-center justify-center p-4"
             onClick={() => setShowExitModal(false)}
           >
             <motion.div
@@ -125,61 +99,41 @@ export default function TestPage() {
               exit={{ scale: 0.88, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              style={{
-                background: "rgba(255,255,255,0.98)",
-                borderRadius: "20px",
-                padding: "2rem 1.75rem",
-                maxWidth: "380px",
-                width: "100%",
-                textAlign: "center",
-                boxShadow: "0 24px 60px rgba(0,0,0,0.18)",
-              }}
+              className="bg-white/98 rounded-[20px] py-8 px-7 max-w-[380px] w-full text-center shadow-[0_24px_60px_rgba(0,0,0,0.18)]"
             >
               {/* Avatar con punto pulsante */}
-              <div style={{ position: "relative", display: "inline-block", marginBottom: "16px" }}>
+              <div className="relative inline-block mb-4">
                 {isDino
                   ? <DinosaurSVG size={80} />
                   : <AvatarSVG config={avatarConfig!} size={80} />
                 }
-                <span style={{ position: "absolute", top: "-2px", right: "-2px", width: "14px", height: "14px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ position: "absolute", width: "14px", height: "14px", borderRadius: "50%", background: "#f59e0b", opacity: 0.75, animation: "ping 1.5s cubic-bezier(0,0,0.2,1) infinite" }} />
-                  <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#d97706", flexShrink: 0 }} />
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 flex items-center justify-center">
+                  <span className="absolute w-3.5 h-3.5 rounded-full bg-amber-500 opacity-75 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-600 shrink-0" />
                 </span>
               </div>
 
-              <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1e1e1e", marginBottom: "8px" }}>
+              <h3 className="text-lg font-bold text-[#1e1e1e] mb-2">
                 ¿Salir del test?
               </h3>
-              <p style={{ fontSize: "13px", color: "#5c5c5c", lineHeight: 1.6, marginBottom: "6px" }}>
+              <p className="text-[13px] text-[#5c5c5c] leading-[1.6] mb-1.5">
                 Tu progreso está guardado en la pregunta{" "}
-                <strong style={{ color: "#cc2b2b" }}>{logic.current + 1} de {logic.total}</strong>.
+                <strong className="text-[#cc2b2b]">{logic.current + 1} de {logic.total}</strong>.
               </p>
-              <p style={{ fontSize: "12px", color: "#888", marginBottom: "20px" }}>
+              <p className="text-xs text-[#888] mb-5">
                 Puedes continuar desde tu perfil o desde la pantalla de inicio del test.
               </p>
 
-              <div style={{ display: "flex", gap: "10px" }}>
+              <div className="flex gap-2.5">
                 <button
                   onClick={() => setShowExitModal(false)}
-                  style={{
-                    flex: 1, padding: "12px",
-                    background: "linear-gradient(135deg, #ffb3b3, #ff7f7f)",
-                    border: "none", borderRadius: "12px",
-                    color: "#1e1e1e", fontWeight: 700, fontSize: "14px",
-                    cursor: "pointer",
-                  }}
+                  className="flex-1 p-3 bg-[linear-gradient(135deg,#ffb3b3,#ff7f7f)] border-0 rounded-xl text-[#1e1e1e] font-bold text-sm cursor-pointer"
                 >
                   Continuar test
                 </button>
                 <button
                   onClick={handleExitConfirm}
-                  style={{
-                    flex: 1, padding: "12px",
-                    background: "transparent",
-                    border: "1px solid rgba(0,0,0,0.15)", borderRadius: "12px",
-                    color: "#5c5c5c", fontWeight: 600, fontSize: "14px",
-                    cursor: "pointer",
-                  }}
+                  className="flex-1 p-3 bg-transparent border border-black/15 rounded-xl text-[#5c5c5c] font-semibold text-sm cursor-pointer"
                 >
                   Salir
                 </button>
@@ -189,7 +143,7 @@ export default function TestPage() {
         )}
       </AnimatePresence>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", minHeight: "calc(100vh - 57px)" }}>
+      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-57px)]">
         {logic.phase === "intro" ? (
           <TestIntro
             onStart={handleStart}
