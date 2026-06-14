@@ -12,6 +12,8 @@ import { careers } from "@/lib/careers";
 import { UserBadge } from "@/lib/badges";
 import { fetchUserBadges } from "@/src/services/badgeService";
 import BadgeDisplay from "@/app/components/BadgeDisplay";
+import SkillAssessment from "./components/SkillAssessment";
+import SkillGapDashboard from "./components/SkillGapDashboard";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -727,171 +729,49 @@ export default function PerfilPage() {
               )}
             </div>
 
-            {/* ── Test en progreso ── */}
-            {inProgressTest && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-[2rem] border-2 border-amber-300 bg-amber-50 p-6 shadow-[0_22px_70px_rgba(251,191,36,0.15)]"
-              >
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-2xl">
-                    ⏳
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-amber-900">Test Vocacional en progreso</p>
-                    <p className="text-xs text-amber-700 mt-0.5">
-                      Ibas por la pregunta{" "}
-                      <strong>{inProgressTest.current + 1} de 10</strong>
-                      {" "}·{" "}
-                      <strong>{inProgressTest.answeredCount}</strong>{" "}
-                      {inProgressTest.answeredCount === 1 ? "respuesta" : "respuestas"} registradas
-                    </p>
-                    <p className="text-[11px] text-amber-600 mt-0.5">
-                      Guardado el{" "}
-                      {new Date(inProgressTest.savedAt).toLocaleDateString("es-PE", {
-                        day: "2-digit", month: "long",
-                      })}
-                    </p>
-                  </div>
-                </div>
-                {/* Barra de progreso */}
-                <div className="mb-4 h-2 overflow-hidden rounded-full bg-amber-200">
-                  <motion.div
-                    className="h-full rounded-full bg-amber-400"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(inProgressTest.current / 10) * 100}%` }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                  />
-                </div>
-                <a
-                  href="/test"
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 py-3 text-sm font-bold text-white shadow-md transition hover:bg-amber-600"
+            {/* ── Selector de Carrera ── */}
+            {user && (
+              <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600 mb-4">
+                  Carrera de interés
+                </p>
+                <p className="text-sm text-slate-500 mb-4">
+                  Selecciona la carrera que te interesa para desbloquear el análisis de skills.
+                </p>
+                <select
+                  value={profile.carrera || ""}
+                  onChange={async (e) => {
+                    const value = e.target.value;
+                    setProfile((prev) => ({ ...prev, carrera: value || undefined }));
+                    try {
+                      await updateDoc(doc(db, colUsuario, user.uid), { carrera: value });
+                    } catch { /* silent */ }
+                  }}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-100"
                 >
-                  ▶ Continuar el test ahora
-                </a>
-              </motion.div>
+                  <option value="">— Selecciona una carrera —</option>
+                  {careers.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.emoji} {c.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
 
-            {/* ── Historial de Test Vocacional ── */}
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
-              <div className="mb-5 flex items-center justify-between">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-600">
-                  Historial de test vocacional
-                </p>
-                <a
-                  href="/test"
-                  className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 hover:border-red-200"
-                >
-                  + Nuevo test
-                </a>
+            {/* ── Skills Assessment ── */}
+            {user && profile.carrera && (
+              <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
+                <SkillAssessment userId={user.uid} careerId={profile.carrera} />
               </div>
+            )}
 
-              {historyLoading ? (
-                <div className="space-y-3">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="h-20 rounded-2xl bg-slate-100 animate-pulse" />
-                  ))}
-                </div>
-              ) : testHistory.length === 0 ? (
-                <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 py-8 text-center">
-                  <span className="text-3xl">🎯</span>
-                  <p className="text-sm text-slate-500">Aún no has realizado el test vocacional.</p>
-                  <a
-                    href="/test"
-                    className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
-                  >
-                    Hacer el test ahora
-                  </a>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {testHistory.map((entry, i) => (
-                    <motion.div
-                      key={entry.id}
-                      initial={{ opacity: 0, x: -16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.07 }}
-                      className={`rounded-2xl border p-4 ${
-                        entry.insufficient
-                          ? "border-slate-200 bg-slate-50"
-                          : "border-red-100 bg-red-50/40"
-                      }`}
-                    >
-                      {/* Fila superior */}
-                      <div className="mb-2.5 flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-2.5">
-                          <span className="text-2xl leading-none">
-                            {entry.insufficient ? "😔" : entry.careerEmoji ?? "🎓"}
-                          </span>
-                          <div>
-                            <p className="text-sm font-bold text-slate-900 leading-tight">
-                              {entry.insufficient
-                                ? "Sin resultado suficiente"
-                                : entry.careerTitle ?? "Carrera detectada"}
-                            </p>
-                            <p className="text-[11px] text-slate-400 mt-0.5">
-                              {entry.completedAt
-                                ? formatDate(entry.completedAt)
-                                : "Fecha no disponible"}
-                            </p>
-                          </div>
-                        </div>
-                        <span
-                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                            entry.insufficient
-                              ? "bg-slate-200 text-slate-600"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {entry.insufficient ? "Insuficiente" : "Completado ✓"}
-                        </span>
-                      </div>
-
-                      {/* Barra de compatibilidad (solo si hay resultado) */}
-                      {!entry.insufficient && entry.match !== null && (
-                        <>
-                          <div className="mb-1 flex items-center justify-between">
-                            <span className="text-xs text-slate-500">Compatibilidad</span>
-                            <span className="text-xs font-bold text-red-600">{entry.match}%</span>
-                          </div>
-                          <div className="mb-2.5 h-1.5 overflow-hidden rounded-full bg-slate-200">
-                            <motion.div
-                              className="h-full rounded-full bg-gradient-to-r from-red-500 to-rose-400"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${entry.match}%` }}
-                              transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 + i * 0.07 }}
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      {/* Detalle inferior */}
-                      <div className="flex items-center gap-4 text-xs text-slate-500">
-                        {entry.insufficient ? (
-                          <span>
-                            Respondidas: <strong className="text-slate-700">{entry.answered}/10</strong>
-                          </span>
-                        ) : (
-                          <>
-                            <span>
-                              Puntaje: <strong className="text-slate-700">{entry.score} pts</strong>
-                            </span>
-                            <span>·</span>
-                            <a
-                              href={`/roadmap?career=${entry.careerKey}`}
-                              className="font-semibold text-red-600 hover:underline"
-                            >
-                              Ver roadmap →
-                            </a>
-                          </>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* ── Skill Gap Dashboard ── */}
+            {user && profile.carrera && (
+              <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
+                <SkillGapDashboard userId={user.uid} careerId={profile.carrera} />
+              </div>
+            )}
 
             {/* ── Proceso de admisión ── */}
             <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">

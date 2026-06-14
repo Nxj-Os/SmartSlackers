@@ -42,28 +42,23 @@ export default function TestPage() {
     }}>
       <Navbar />
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", minHeight: "calc(100vh - 57px)" }}>
-        {logic.phase === "intro" && (
-          <TestIntro
-            onStart={handleStart}
-            hasSession={!!savedSession}
-            sessionProgress={savedSession ? { current: savedSession.current, total: 10 } : undefined}
-            onResume={handleResume}
-          />
-        )}
-        {(logic.phase === "question" || logic.phase === "feedback") && (
-          <QuestionCard
-            question={logic.question}
-            current={logic.current}
-            total={logic.total}
-            timeLeft={logic.timeLeft}
-            selected={logic.selected}
-            score={logic.score}
-            onAnswer={logic.handleAnswer}
-          />
-        )}
-        {logic.phase === "result" && (
-          <ResultScreen result={logic.getResult()} score={logic.score} />
-        )}
+      {logic.phase === "intro" && (
+        <TestIntro onStart={logic.startTest} />
+      )}
+      {(logic.phase === "question" || logic.phase === "feedback") && (
+        <QuestionCard
+          question={logic.question}
+          current={logic.current}
+          total={logic.total}
+          timeLeft={logic.timeLeft}
+          selected={logic.selected}
+          score={logic.score}
+          onAnswer={logic.handleAnswer}
+        />
+      )}
+      {logic.phase === "result" && (
+        <ResultScreen result={logic.getResult()} score={logic.score} answers={logic.answers} />
+      )}
       </div>
     </main>
   );

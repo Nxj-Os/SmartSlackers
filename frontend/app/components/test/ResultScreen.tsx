@@ -2,14 +2,10 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import AvatarCustomizer from "@/app/components/avatar/AvatarCustomizer";
-<<<<<<< Updated upstream
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, addDoc, serverTimestamp, getDoc, doc } from "firebase/firestore";
 import { auth, db } from "@/src/firebase/config";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { trackBadgeEvent, showBadgeNotification } from "@/src/services/badgeService";
-=======
-import type { Career } from "@/types/avatar";
->>>>>>> Stashed changes
 
 type Result = {
   title?: string; desc?: string;
@@ -20,8 +16,8 @@ type Result = {
 };
 
 export default function ResultScreen({
-  result, score
-}: { result: Result; score: number }) {
+  result, score, answers
+}: { result: Result; score: number; answers: string[] }) {
   const [displayMatch, setDisplayMatch] = useState(0);
   const [showAvatar, setShowAvatar] = useState(false);
 
@@ -92,6 +88,16 @@ export default function ResultScreen({
       try {
         const { newBadges } = await trackBadgeEvent(user.uid, "test_completed");
         newBadges.forEach((b) => showBadgeNotification(b));
+      } catch { /* silent */ }
+
+      try {
+        await setDoc(doc(db, "TestResults", user.uid), {
+          careerKey: result.careerKey,
+          matchPercentage: result.match || 0,
+          score,
+          answers,
+          completedAt: serverTimestamp(),
+        });
       } catch { /* silent */ }
     });
     return () => unsub();

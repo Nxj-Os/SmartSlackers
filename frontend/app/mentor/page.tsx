@@ -1,6 +1,9 @@
 "use client";
 
+import { useState, useRef, useEffect, useCallback } from "react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { motion } from "framer-motion";
 import { careers, type Career } from "@/lib/careers";
 import {
   showBadgeNotification,
@@ -15,8 +18,6 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import { motion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { auth, db } from "../../src/firebase/config";
 
 type Message = {
