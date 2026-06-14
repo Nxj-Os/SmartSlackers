@@ -14,7 +14,7 @@ type Result = {
   match?: number;
   color?: string;
   emoji?: string;
-  careerKey: Career;
+  careerKey: string;
   insufficient?: boolean;
   answered?: number;
 };
