@@ -33,6 +33,14 @@ const DEFAULT_AVATAR: AvatarConfig = {
   avatarType: "dino",
 };
 
+type RankingEntry = {
+  careerKey: string;
+  percentage: number;
+  title: string;
+  color: string;
+  emoji: string;
+};
+
 type Result = {
   title?: string;
   desc?: string;
@@ -42,6 +50,7 @@ type Result = {
   careerKey: string;
   insufficient?: boolean;
   answered?: number;
+  ranking?: RankingEntry[];
 };
 
 export default function ResultScreen({
@@ -422,6 +431,54 @@ export default function ResultScreen({
             </div>
           </div>
         </div>
+
+        {/* ── Ranking top 2 carreras ── */}
+        {result.ranking && result.ranking.length >= 2 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55 }}
+            style={{
+              background: "rgba(255,255,255,0.95)",
+              border: "0.5px solid rgba(255,0,0,0.14)",
+              borderRadius: "14px",
+              padding: "1rem 1.25rem",
+              marginBottom: "1.25rem",
+              textAlign: "left",
+            }}
+          >
+            <p style={{ fontSize: "11px", fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
+              🏅 Tu ranking vocacional
+            </p>
+            {result.ranking.map((entry, idx) => (
+              <div key={entry.careerKey} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: idx < result.ranking!.length - 1 ? "10px" : 0 }}>
+                {/* Medalla */}
+                <span style={{ fontSize: "18px", flexShrink: 0 }}>
+                  {idx === 0 ? "🥇" : "🥈"}
+                </span>
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: "13px", fontWeight: 700, color: "#1e1e1e", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {entry.emoji} {entry.title}
+                  </p>
+                  {/* Barra de porcentaje */}
+                  <div style={{ marginTop: "4px", height: "6px", borderRadius: "3px", background: "rgba(0,0,0,0.07)", overflow: "hidden" }}>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${entry.percentage}%` }}
+                      transition={{ duration: 1, delay: 0.6 + idx * 0.15, ease: "easeOut" }}
+                      style={{ height: "100%", borderRadius: "3px", background: entry.color }}
+                    />
+                  </div>
+                </div>
+                {/* Porcentaje */}
+                <span style={{ fontWeight: 800, fontSize: "15px", color: entry.color, flexShrink: 0 }}>
+                  {entry.percentage}%
+                </span>
+              </div>
+            ))}
+          </motion.div>
+        )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <motion.button

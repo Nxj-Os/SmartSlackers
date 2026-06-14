@@ -115,11 +115,24 @@ export function useTestLogic() {
     valid.forEach((career) => {
       count[career] = (count[career] || 0) + 1;
     });
-    const winner = Object.entries(count).sort((a, b) => b[1] - a[1])[0][0];
+    const sorted = Object.entries(count).sort((a, b) => b[1] - a[1]);
+    const winner = sorted[0][0];
+    const total = valid.length;
+
+    // Ranking de las 2 carreras más afines
+    const ranking = sorted.slice(0, 2).map(([key, cnt]) => ({
+      careerKey: key as Career,
+      percentage: Math.round((cnt / total) * 100),
+      title: careerResults[key]?.title ?? key,
+      color: careerResults[key]?.color ?? "#999",
+      emoji: careerResults[key]?.emoji ?? "🎓",
+    }));
+
     return {
       ...careerResults[winner],
       careerKey: winner as Career,
       insufficient: false,
+      ranking,
     };
   };
 
