@@ -51,8 +51,8 @@ export default function LoginPage() {
 
   const router = useRouter();
 
-const handleRegister = async () => {
-  setError("");
+  const handleRegister = async () => {
+    setError("");
 
     if (!name.trim()) {
       setError("Ingresa tu nombre");
@@ -75,13 +75,12 @@ const handleRegister = async () => {
       document.cookie = `vocatio_session=${result.user.uid}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
       setSuccessMessage("Usuario registrado correctamente");
       setShowSuccess(true);
-      router.push("/")
     } catch (error: any) {
       setError(error.message);
     } finally {
       setIsLoading(false);
     }
-};
+  };
 
   const handleLogin = async () => {
     setError("");
@@ -128,32 +127,10 @@ const handleRegister = async () => {
             </div>
 
             <div className="flex items-center justify-center">
-              {/* Image placeholder: place your uploaded image at `public/assets/login-cards.png` */}
               <img
-                src="/assets/login-cards.png"
+                src="/assets/login-cards.jpg"
                 alt="UTP banner"
                 loading="lazy"
-                onError={(e) => {
-                  const target = e.currentTarget as HTMLImageElement;
-                  // Inline SVG fallback that looks like the original cards area
-                  const svg = `
-                    <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='420' viewBox='0 0 1200 420'>
-                      <defs>
-                        <linearGradient id='g' x1='0' x2='1'>
-                          <stop offset='0' stop-color='%23ffecec'/>
-                          <stop offset='1' stop-color='%23fff6ec'/>
-                        </linearGradient>
-                      </defs>
-                      <rect x='0' y='0' width='1200' height='420' rx='28' fill='url(#g)' />
-                      <rect x='40' y='36' width='520' height='140' rx='20' fill='%23fff1f2' stroke='%23fde6e8' />
-                      <rect x='640' y='36' width='520' height='140' rx='20' fill='%23fff9f0' stroke='%23fff0e0' />
-                      <rect x='40' y='200' width='1120' height='140' rx='24' fill='url(#g)' stroke='%23fde6e8' />
-                      <text x='70' y='88' font-family='Georgia, serif' font-size='20' fill='%23c92a2a' letter-spacing='3'>RÁPIDO</text>
-                      <text x='670' y='88' font-family='Georgia, serif' font-size='20' fill='%23d3591f' letter-spacing='3'>CONFIANZA</text>
-                      <text x='70' y='252' font-family='Georgia, serif' font-size='20' fill='%23c92a2a' letter-spacing='3'>SUGERENCIA</text>
-                    </svg>`;
-                  target.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-                }}
                 className="w-full rounded-[1.75rem] object-cover shadow-sm max-h-56 sm:max-h-72"
               />
             </div>
@@ -163,199 +140,149 @@ const handleRegister = async () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="relative rounded-[2rem] border border-slate-200 bg-slate-50/95 p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]"
+            className="relative flex flex-col justify-center gap-4 rounded-[2rem] border border-slate-200 bg-slate-50/95 p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]"
           >
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nombre
-            </label>
+            {/* Campo Nombre (Solo si no es Login) */}
+            {!isLogin && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  placeholder="Tu nombre"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); setError(""); }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-700 mb-2"
+                />
+              </motion.div>
+            )}
 
-              <input
-                type="text"
-                placeholder="Tu nombre"
-                value={name}
-                onChange={(e) => { setName(e.target.value); setError(""); }}
-                className="
-                w-full
-                px-4
-                py-3
-                border
-                border-gray-300
-                rounded-xl
-                focus:outline-none
-                focus:ring-2
-                focus:ring-red-700
-              "
-            />
-          </motion.div>
-        )}
-
+            {/* Campo Correo */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Correo electrónico
               </label>
-
               <input
                 type="email"
                 placeholder="correo@ejemplo.com"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(""); }}
-                className="
-                  w-full
-                  px-4
-                  py-3
-                  border
-                  border-gray-300
-                  rounded-xl
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-red-700
-                  transition
-                "
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-700 transition"
               />
             </div>
 
+            {/* Campo Contraseña */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Contraseña
               </label>
-
               <input
                 type="password"
                 placeholder="********"
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                className="
-                  w-full
-                  px-4
-                  py-3
-                  border
-                  border-gray-300
-                  rounded-xl
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-red-700
-                  transition
-                "
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-700 transition"
               />
             </div>
 
-      {!isLogin && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Confirmar contraseña
-          </label>
+            {/* Campo Confirmar Contraseña (Solo si no es Login) */}
+            {!isLogin && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirmar contraseña
+                </label>
+                <input
+                  type="password"
+                  placeholder="********"
+                  value={confirmPassword}
+                  onChange={(e) => { setConfirmPassword(e.target.value); setError(""); }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-700"
+                />
+              </motion.div>
+            )}
 
-          <input
-            type="password"
-            placeholder="********"
-            value={confirmPassword}
-            onChange={(e) => { setConfirmPassword(e.target.value); setError(""); }}
-            className="
-              w-full
-              px-4
-              py-3
-              border
-              border-gray-300
-              rounded-xl
-              focus:outline-none
-              focus:ring-2
-              focus:ring-red-700
-            "
-          />
-        </motion.div>
-      )}
+            {/* Alerta de Error */}
+            <AnimatePresence mode="wait">
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -5, height: 0 }}
+                  className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 px-3 py-2"
+                >
+                  <svg className="h-4 w-4 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm text-red-600">{error}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -5, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: "auto" }}
-            exit={{ opacity: 0, y: -5, height: 0 }}
-            className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 px-3 py-2"
-          >
-            <svg className="h-4 w-4 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="text-sm text-red-600">{error}</span>
+            {/* Botón Principal */}
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={isLogin ? handleLogin : handleRegister}
+              disabled={isLoading}
+              className="w-full bg-red-800 hover:bg-red-900 text-white py-3 rounded-xl font-semibold transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+            >
+              {isLoading ? (
+                <>
+                  <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  {isLogin ? "Iniciando..." : "Creando cuenta..."}
+                </>
+              ) : (
+                isLogin ? "Iniciar Sesión" : "Crear Cuenta"
+              )}
+            </motion.button>
+
+            {/* Alternar Registro/Login */}
+            <div className="text-center mt-2">
+              {isLogin ? (
+                <>
+                  <span className="text-gray-500">¿No tienes cuenta?</span>
+                  <button
+                    type="button"
+                    onClick={() => { setIsLogin(false); setError(""); }}
+                    className="ml-2 text-red-700 font-semibold hover:underline"
+                  >
+                    Registrarse
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="text-gray-500">¿Ya tienes cuenta?</span>
+                  <button
+                    type="button"
+                    onClick={() => { setIsLogin(true); setError(""); }}
+                    className="ml-2 text-red-700 font-semibold hover:underline"
+                  >
+                    Iniciar sesión
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Footer interno */}
+            <div className="mt-4 text-center text-sm text-gray-500">
+              VocatioAI © 2026
+            </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </motion.section>
+      </div>
 
-      <motion.button
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
-        onClick={isLogin ? handleLogin : handleRegister}
-        disabled={isLoading}
-        className="
-          w-full
-          bg-red-800
-          hover:bg-red-900
-          text-white
-          py-3
-          rounded-xl
-          font-semibold
-          transition
-          shadow-lg
-          disabled:opacity-50 disabled:cursor-not-allowed
-          flex items-center justify-center gap-2
-        "
-      >
-        {isLoading ? (
-          <>
-            <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            {isLogin ? "Iniciando..." : "Creando cuenta..."}
-          </>
-        ) : (
-          isLogin ? "Iniciar Sesión" : "Crear Cuenta"
-        )}
-      </motion.button>
-
-          <div className="text-center mt-4">
-      {isLogin ? (
-        <>
-          <span className="text-gray-500">
-            ¿No tienes cuenta?
-          </span>
-
-          <button
-            onClick={() => { setIsLogin(false); setError(""); }}
-            className="ml-2 text-red-700 font-semibold hover:underline"
-          >
-            Registrarse
-          </button>
-        </>
-      ) : (
-        <>
-          <span className="text-gray-500">
-            ¿Ya tienes cuenta?
-          </span>
-
-          <button
-            onClick={() => { setIsLogin(true); setError(""); }}
-            className="ml-2 text-red-700 font-semibold hover:underline"
-          >
-            Iniciar sesión
-          </button>
-        </>
-      )}
-    </div>
-
-          </div>
-
-          <div className="mt-8 text-center text-sm text-gray-500">
-            VocatioAI © 2026
-          </div>
-
-        </motion.div>
-
-      </section>
-
+      {/* Modal de éxito */}
       <AnimatePresence>
         {showSuccess && (
           <SuccessModal
@@ -364,7 +291,6 @@ const handleRegister = async () => {
           />
         )}
       </AnimatePresence>
-
     </main>
   );
 }

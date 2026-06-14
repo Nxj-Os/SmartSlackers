@@ -9,7 +9,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../src/firebase/config";
 import { db } from "../../src/firebase/config";
 import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { trackBadgeEvent, showBadgeNotification } from "@/src/services/badgeService";
 
 type Message = {
